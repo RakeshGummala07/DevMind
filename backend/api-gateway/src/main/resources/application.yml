@@ -1,0 +1,50 @@
+server:
+  port: 9000
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: ${FRONTEND_ORIGIN:http://localhost:5173}
+            allowedMethods: [GET, POST, PUT, PATCH, DELETE, OPTIONS]
+            allowedHeaders: "*"
+            allowCredentials: true
+      routes:
+        - id: auth-service
+          uri: http://auth-service:8081
+          predicates:
+            - Path=/api/auth/**
+        - id: repository-service
+          uri: http://repository-service:8082
+          predicates:
+            - Path=/api/repositories/**,/api/pull-requests/**,/api/github/**
+        - id: ai-service
+          uri: http://ai-service:8083
+          predicates:
+            - Path=/api/repositories/*/search,/api/repositories/*/chat,/api/repositories/*/documentation
+        - id: analysis-service
+          uri: http://analysis-service:8085
+          predicates:
+            - Path=/api/analytics/**
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  pattern:
+    console: "%d{ISO8601} %-5level [%X{correlationId}] %logger{36} - %msg%n"

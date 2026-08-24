@@ -1,0 +1,116 @@
+/*
+  DevMind design tokens.
+
+  Thesis: "you can see the system thinking." DevMind's whole value proposition
+  is that AI answers are grounded in retrieved source, not invented — so the
+  palette encodes exactly that distinction instead of decorating arbitrarily:
+
+    --ember  = the system is actively reasoning / indexing / generating (warm,
+               unresolved — used on progress states, streaming text, the trace line)
+    --signal = a claim is grounded in retrieved source (cool, confirmed — used
+               on citations, completed indexing, passed checks)
+
+  Everything else is a quiet, dark, hairline-bordered "instrument panel" so
+  those two colors carry real meaning instead of competing with a rainbow.
+*/
+
+:root,
+[data-theme='dark'] {
+  /* Surfaces — ink, not pure black; blue-shifted so it doesn't read as GitHub's dark theme */
+  --surface-0: #0b0e14;
+  --surface-1: #10141c;
+  --surface-2: #161b26;
+  --surface-3: #1e2430;
+
+  /* Borders */
+  --border: #232a38;
+  --border-strong: #313a4d;
+
+  /* Text */
+  --text-primary: #e7e9ee;
+  --text-secondary: #9aa3b8;
+  --text-muted: #656e83;
+
+  /* Signature accents */
+  --ember: #ff8a3d;
+  --ember-dim: #ff8a3d26;
+  --signal: #35d0ba;
+  --signal-dim: #35d0ba26;
+
+  /* Semantic (used sparingly — severity only) */
+  --critical: #ff5c5c;
+  --high: #ff8a3d;
+  --medium: #f0c93d;
+  --low: #35d0ba;
+  --info: #6d7690;
+
+  /* Typography */
+  --font-display: 'Space Grotesk', 'Inter', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  /* Layout */
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 16px;
+  --sidebar-width: 248px;
+  --topnav-height: 56px;
+
+  /* Motion (single source of truth, matches motionTokens.js) */
+  --ease-signature: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-micro: 0.2s;
+  --dur-base: 0.35s;
+  --dur-page: 0.45s;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--surface-0);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+code,
+pre,
+.mono {
+  font-family: var(--font-mono);
+}
+
+a {
+  color: inherit;
+}
+
+::selection {
+  background: var(--ember-dim);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

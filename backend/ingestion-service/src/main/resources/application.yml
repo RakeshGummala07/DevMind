@@ -1,0 +1,31 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: ingestion-service
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: ingestion-service
+      auto-offset-reset: earliest
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+  endpoint:
+    health:
+      show-details: always
+
+devmind:
+  qdrant-url: ${QDRANT_URL:http://localhost:6333}
+  ai-provider: ${AI_PROVIDER:ollama}
+  ollama-base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+  ai-model: ${AI_MODEL:llama3.1:8b}
+  embedding-model: ${EMBEDDING_MODEL:nomic-embed-text}
+
+logging:
+  pattern:
+    console: "%d{ISO8601} %-5level [%X{correlationId}] %logger{36} - %msg%n"
