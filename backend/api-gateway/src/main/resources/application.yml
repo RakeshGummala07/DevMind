@@ -18,14 +18,17 @@ spring:
           uri: http://auth-service:8081
           predicates:
             - Path=/api/auth/**
-        - id: repository-service
-          uri: http://repository-service:8082
-          predicates:
-            - Path=/api/repositories/**,/api/pull-requests/**,/api/github/**
+        # More specific ai-service routes must be listed before repository-service's
+        # broader /api/repositories/** catch-all — Spring Cloud Gateway matches routes
+        # in declaration order, and a catch-all listed first would shadow these forever.
         - id: ai-service
           uri: http://ai-service:8083
           predicates:
             - Path=/api/repositories/*/search,/api/repositories/*/chat,/api/repositories/*/documentation
+        - id: repository-service
+          uri: http://repository-service:8082
+          predicates:
+            - Path=/api/repositories/**,/api/pull-requests/**,/api/github/**
         - id: analysis-service
           uri: http://analysis-service:8085
           predicates:
@@ -35,6 +38,10 @@ spring:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
+
+devmind:
+  jwt-secret: ${JWT_SECRET:replace_with_a_long_random_string_min_256_bits}
+
 
 management:
   endpoints:

@@ -10,8 +10,22 @@ spring:
     password: ${MYSQL_PASSWORD:devmind_local_password}
   jpa:
     hibernate:
+      # Flyway owns the schema; Hibernate only ever validates it matches the entities.
       ddl-auto: validate
     open-in-view: false
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    table : auth_flyway_schema_history
+
+devmind:
+  jwt-secret: ${JWT_SECRET:replace_with_a_long_random_string_min_256_bits}
+  jwt-access-token-ttl-minutes: ${JWT_ACCESS_TOKEN_TTL_MINUTES:15}
+  jwt-refresh-token-ttl-days: ${JWT_REFRESH_TOKEN_TTL_DAYS:7}
+  github-client-id: ${GITHUB_CLIENT_ID:}
+  github-client-secret: ${GITHUB_CLIENT_SECRET:}
+  github-redirect-uri: ${GITHUB_REDIRECT_URI:http://localhost:5173/oauth/callback}
+  internal-api-key: ${INTERNAL_API_KEY:replace_with_a_shared_internal_secret}
 
 management:
   endpoints:
@@ -26,3 +40,4 @@ management:
 logging:
   pattern:
     console: "%d{ISO8601} %-5level [%X{correlationId}] %logger{36} - %msg%n"
+

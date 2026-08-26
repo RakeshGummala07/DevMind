@@ -7,6 +7,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { store } from './store/store.js';
 import App from './App.jsx';
 import './styles/tokens.css';
+import './styles/responsive.css';
 
 const queryClient = new QueryClient({
   defaultOptions: {

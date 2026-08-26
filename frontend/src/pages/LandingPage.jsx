@@ -51,7 +51,7 @@ export default function LandingPage() {
         answer, review finding, and doc traces back to real source — never a guess.
       </p>
 
-      <div style={{ width: 280 }}>
+      <div style={{ width: 'min(280px, 80vw)' }}>
         <TraceLine active tone="ember" />
       </div>
 

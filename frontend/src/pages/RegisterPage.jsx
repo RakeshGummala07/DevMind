@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import Button from '../components/Button.jsx';
 import { fadeUp, transitions } from '../utils/motionTokens.js';
+import { registerRequest } from '../features/auth/authApi.js';
+import { loginStart, loginSuccess, loginFailure } from '../features/auth/authSlice.js';
 
 const inputStyle = {
   width: '100%',
@@ -19,15 +22,33 @@ const inputStyle = {
 export default function RegisterPage() {
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    setError('');
     if (!form.name || !form.email || !form.password) {
       setError('Fill in every field to create an account.');
       return;
     }
-    setError('');
-    // POST /api/auth/register — wired up once auth-service is implemented (Phase 2)
+    if (form.password.length < 8) {
+      setError('Password must be at least 8 characters.');
+      return;
+    }
+    setSubmitting(true);
+    dispatch(loginStart());
+    try {
+      const { user, accessToken } = await registerRequest(form);
+      dispatch(loginSuccess({ user, accessToken }));
+      navigate('/dashboard');
+    } catch (err) {
+      dispatch(loginFailure());
+      setError(err.response?.data?.error?.message || 'Could not create your account.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -41,7 +62,7 @@ export default function RegisterPage() {
       <form
         onSubmit={handleSubmit}
         style={{
-          width: 380,
+          width: 'min(380px, 100%)',
           padding: 32,
           borderRadius: 'var(--radius-lg)',
           border: '1px solid var(--border)',
@@ -68,18 +89,16 @@ export default function RegisterPage() {
         />
         <input
           style={inputStyle}
-          placeholder="Password"
+          placeholder="Password (min. 8 characters)"
           type="password"
           value={form.password}
           onChange={(e) => setForm({ ...form, password: e.target.value })}
         />
 
-        {error && (
-          <p style={{ color: 'var(--critical)', fontSize: 13, marginBottom: 12 }}>{error}</p>
-        )}
+        {error && <p style={{ color: 'var(--critical)', fontSize: 13, marginBottom: 12 }}>{error}</p>}
 
         <Button type="submit" style={{ width: '100%' }}>
-          Create account
+          {submitting ? 'Creating account…' : 'Create account'}
         </Button>
 
         <p style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 20, textAlign: 'center' }}>

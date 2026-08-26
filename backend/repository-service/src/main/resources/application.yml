@@ -12,6 +12,11 @@ spring:
     hibernate:
       ddl-auto: validate
     open-in-view: false
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 0
+    table: repository_flyway_schema_history
   data:
     redis:
       host: ${REDIS_HOST:localhost}
@@ -21,6 +26,10 @@ spring:
     consumer:
       group-id: repository-service
       auto-offset-reset: earliest
+
+devmind:
+  auth-service-url: ${AUTH_SERVICE_URL:http://auth-service:8081}
+  internal-api-key: ${INTERNAL_API_KEY:replace_with_a_shared_internal_secret}
 
 management:
   endpoints:

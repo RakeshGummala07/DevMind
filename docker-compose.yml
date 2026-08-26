@@ -9,7 +9,7 @@ services:
       MYSQL_USER: ${MYSQL_USERNAME}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-    ports: ["3306:3306"]
+    ports: ["3307:3306"]
     volumes: ["mysql_data:/var/lib/mysql"]
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
@@ -121,21 +121,34 @@ services:
     ports: ["16686:16686", "4317:4317", "4318:4318"]
 
   # ── Application services ──────────────────────────────
+  auth-service:
+    build: { context: ./backend, dockerfile: auth-service/Dockerfile }
+    env_file: .env
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8081/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
   api-gateway:
     build: { context: ./backend, dockerfile: api-gateway/Dockerfile }
     ports: ["9000:9000"]
     env_file: .env
-    depends_on: [mysql, redis]
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:9000/actuator/health || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 10
-
-  auth-service:
-    build: { context: ./backend, dockerfile: auth-service/Dockerfile }
-    env_file: .env
-    depends_on: [mysql, redis]
 
   repository-service:
     build: { context: ./backend, dockerfile: repository-service/Dockerfile }

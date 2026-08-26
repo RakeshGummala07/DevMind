@@ -33,7 +33,8 @@ export default function DashboardPage() {
         initial="initial"
         animate="animate"
         variants={{ animate: { transition: { staggerChildren: stagger.dashboard } } }}
-        style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 28 }}
+        className="grid-4"
+        style={{ marginBottom: 28 }}
       >
         {METRICS.map((metric) => (
           <motion.div

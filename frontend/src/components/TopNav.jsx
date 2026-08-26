@@ -1,43 +1,50 @@
-import { IconSearch, IconBell } from '@tabler/icons-react';
-import { useSelector } from 'react-redux';
-import TraceLine from './TraceLine.jsx';
+import { useState } from 'react';
+import { IconSearch, IconBell, IconLogout, IconMenu2 } from '@tabler/icons-react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { logout as logoutAction } from '../features/auth/authSlice.js';
+import { logoutRequest } from '../features/auth/authApi.js';
+import { transitions } from '../utils/motionTokens.js';
 
-export default function TopNav({ traceActive = false }) {
+export default function TopNav({ onMenuClick }) {
   const user = useSelector((state) => state.auth.user);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleLogout = async () => {
+    setMenuOpen(false);
+    try {
+      await logoutRequest();
+    } finally {
+      dispatch(logoutAction());
+      navigate('/login');
+    }
+  };
 
   return (
-    <div style={{ position: 'sticky', top: 0, zIndex: 10 }}>
-      <div
-        style={{
-          height: 'var(--topnav-height)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '0 24px',
-          background: 'var(--surface-1)',
-          borderBottom: '1px solid var(--border)',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            background: 'var(--surface-2)',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--radius-sm)',
-            padding: '7px 12px',
-            width: 320,
-            color: 'var(--text-muted)',
-          }}
-        >
-          <IconSearch size={16} />
-          <span style={{ fontSize: 13 }}>Search repositories, code, PRs…</span>
+    <div className="topnav-wrap">
+      <div className="topnav">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <button
+            className="show-mobile"
+            onClick={onMenuClick}
+            aria-label="Open menu"
+            style={{ background: 'none', border: 'none', color: 'var(--text-primary)', cursor: 'pointer', padding: 4 }}
+          >
+            <IconMenu2 size={20} />
+          </button>
+          <div className="topnav__search">
+            <IconSearch size={16} />
+            <span style={{ fontSize: 13 }}>Search repositories, code, PRs…</span>
+          </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-          <IconBell size={18} color="var(--text-secondary)" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 18, position: 'relative' }}>
+          <IconBell size={18} color="var(--text-secondary)" className="hide-mobile" />
           <div
+            onClick={() => setMenuOpen((open) => !open)}
             style={{
               width: 30,
               height: 30,
@@ -49,13 +56,59 @@ export default function TopNav({ traceActive = false }) {
               fontFamily: 'var(--font-mono)',
               fontSize: 12,
               color: 'var(--text-secondary)',
+              cursor: 'pointer',
             }}
           >
             {user?.name?.[0]?.toUpperCase() ?? '?'}
           </div>
+
+          <AnimatePresence>
+            {menuOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={transitions.micro}
+                style={{
+                  position: 'absolute',
+                  top: 40,
+                  right: 0,
+                  background: 'rgba(22, 27, 38, 0.9)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius-sm)',
+                  minWidth: 160,
+                  overflow: 'hidden',
+                }}
+              >
+                <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--border)' }}>
+                  <div style={{ fontSize: 13 }}>{user?.name}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{user?.role}</div>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    padding: '10px 14px',
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--critical)',
+                    fontSize: 13,
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                  }}
+                >
+                  <IconLogout size={15} />
+                  Sign out
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
-      <TraceLine active={traceActive} tone="ember" />
     </div>
   );
 }

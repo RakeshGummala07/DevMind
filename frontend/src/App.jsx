@@ -2,6 +2,9 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 
 import AppLayout from './layouts/AppLayout.jsx';
+import RequireAuth from './layouts/RequireAuth.jsx';
+import { useBootstrapSession } from './features/auth/useBootstrapSession.js';
+import TraceLine from './components/TraceLine.jsx';
 
 import LandingPage from './pages/LandingPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
@@ -23,6 +26,17 @@ import SettingsPage from './pages/SettingsPage.jsx';
 
 export default function App() {
   const location = useLocation();
+  const sessionChecked = useBootstrapSession();
+
+  if (!sessionChecked) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: 200 }}>
+          <TraceLine active tone="ember" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <AnimatePresence mode="wait">
@@ -34,19 +48,21 @@ export default function App() {
         <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
 
         {/* Authenticated */}
-        <Route element={<AppLayout />}>
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/repositories" element={<RepositoriesPage />} />
-          <Route path="/repositories/:id" element={<RepositoryDetailPage />} />
-          <Route path="/repositories/:id/search" element={<CodeSearchPage />} />
-          <Route path="/repositories/:id/chat" element={<CodebaseChatPage />} />
-          <Route path="/repositories/:id/pull-requests" element={<PullRequestsPage />} />
-          <Route path="/repositories/:id/analytics" element={<RepositoryAnalyticsPage />} />
-          <Route path="/repositories/:id/documentation" element={<DocumentationPage />} />
-          <Route path="/reviews" element={<ReviewsPage />} />
-          <Route path="/analytics" element={<AnalyticsPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/settings" element={<SettingsPage />} />
+        <Route element={<RequireAuth />}>
+          <Route element={<AppLayout />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/repositories" element={<RepositoriesPage />} />
+            <Route path="/repositories/:id" element={<RepositoryDetailPage />} />
+            <Route path="/repositories/:id/search" element={<CodeSearchPage />} />
+            <Route path="/repositories/:id/chat" element={<CodebaseChatPage />} />
+            <Route path="/repositories/:id/pull-requests" element={<PullRequestsPage />} />
+            <Route path="/repositories/:id/analytics" element={<RepositoryAnalyticsPage />} />
+            <Route path="/repositories/:id/documentation" element={<DocumentationPage />} />
+            <Route path="/reviews" element={<ReviewsPage />} />
+            <Route path="/analytics" element={<AnalyticsPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+          </Route>
         </Route>
       </Routes>
     </AnimatePresence>

@@ -1,5 +1,8 @@
 import { NavLink } from 'react-router-dom';
-import { IconLayoutDashboard, IconFolder, IconGitPullRequest, IconChartBar } from '@tabler/icons-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { IconLayoutDashboard, IconFolder, IconGitPullRequest, IconChartBar, IconX } from '@tabler/icons-react';
+import { useIsMobile } from '../hooks/useIsMobile.js';
+import { transitions } from '../utils/motionTokens.js';
 
 const NAV_ITEMS = [
   { to: '/dashboard', label: 'Dashboard', Icon: IconLayoutDashboard },
@@ -8,21 +11,10 @@ const NAV_ITEMS = [
   { to: '/analytics', label: 'Analytics', Icon: IconChartBar },
 ];
 
-export default function Sidebar() {
+function SidebarContent({ onNavigate, onClose }) {
   return (
-    <aside
-      style={{
-        width: 'var(--sidebar-width)',
-        minHeight: '100vh',
-        borderRight: '1px solid var(--border)',
-        background: 'var(--surface-1)',
-        padding: '20px 12px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 4,
-      }}
-    >
-      <div style={{ padding: '4px 12px 20px' }}>
+    <>
+      <div style={{ padding: '4px 12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span
           style={{
             fontFamily: 'var(--font-display)',
@@ -33,12 +25,22 @@ export default function Sidebar() {
         >
           DevMind
         </span>
+        {onClose && (
+          <button
+            onClick={onClose}
+            aria-label="Close menu"
+            style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: 4 }}
+          >
+            <IconX size={18} />
+          </button>
+        )}
       </div>
 
       {NAV_ITEMS.map(({ to, label, Icon }) => (
         <NavLink
           key={to}
           to={to}
+          onClick={onNavigate}
           style={({ isActive }) => ({
             display: 'flex',
             alignItems: 'center',
@@ -57,6 +59,45 @@ export default function Sidebar() {
           {label}
         </NavLink>
       ))}
-    </aside>
+    </>
+  );
+}
+
+export default function Sidebar({ mobileOpen = false, onClose }) {
+  const isMobile = useIsMobile();
+
+  if (!isMobile) {
+    return (
+      <aside className="sidebar">
+        <SidebarContent />
+      </aside>
+    );
+  }
+
+  // Mobile: off-canvas drawer, only mounted (and only capturing clicks) while open.
+  return (
+    <AnimatePresence>
+      {mobileOpen && (
+        <>
+          <motion.div
+            className="sidebar__scrim"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={transitions.micro}
+            onClick={onClose}
+          />
+          <motion.aside
+            className="sidebar"
+            initial={{ x: -260 }}
+            animate={{ x: 0 }}
+            exit={{ x: -260 }}
+            transition={transitions.base}
+          >
+            <SidebarContent onNavigate={onClose} onClose={onClose} />
+          </motion.aside>
+        </>
+      )}
+    </AnimatePresence>
   );
 }
