@@ -28,3 +28,7 @@ infrastructure/**/data/
 # Logs
 *.log
 logs/
+
+.env.example
+
+README.md
