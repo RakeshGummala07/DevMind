@@ -9,6 +9,13 @@ spring:
     consumer:
       group-id: ingestion-service
       auto-offset-reset: earliest
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        # See repository-service's application.yml for why type headers are disabled
+        # and a default type is forced instead — same reasoning applies here.
+        spring.json.value.default.type: com.devmind.ingestionservice.event.IndexEvent
+        spring.json.use.type.headers: false
+        spring.json.trusted.packages: com.devmind.ingestionservice.event
 
 management:
   endpoints:
@@ -21,10 +28,18 @@ management:
 
 devmind:
   qdrant-url: ${QDRANT_URL:http://localhost:6333}
+  qdrant-collection: ${QDRANT_COLLECTION:devmind_code_chunks}
   ai-provider: ${AI_PROVIDER:ollama}
   ollama-base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
   ai-model: ${AI_MODEL:llama3.1:8b}
   embedding-model: ${EMBEDDING_MODEL:nomic-embed-text}
+  embedding-dimensions: ${EMBEDDING_DIMENSIONS:768}
+  auth-service-url: ${AUTH_SERVICE_URL:http://auth-service:8081}
+  internal-api-key: ${INTERNAL_API_KEY:replace_with_a_shared_internal_secret}
+  workspace-dir: ${INGESTION_WORKSPACE_DIR:/tmp/devmind-ingestion}
+  max-file-size-bytes: ${MAX_FILE_SIZE_BYTES:1048576}
+  chunk-lines: ${CHUNK_LINES:120}
+  chunk-overlap-lines: ${CHUNK_OVERLAP_LINES:15}
 
 logging:
   pattern:

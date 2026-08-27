@@ -112,7 +112,6 @@ public class GithubOAuthClient {
         );
     }
 
-    /** GitHub omits email from /user if the user has it set to private, so fall back to /user/emails. */
     @SuppressWarnings("unchecked")
     private String fetchPrimaryEmail(String githubAccessToken) {
         List<Map<String, Object>> emails;

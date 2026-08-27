@@ -18,7 +18,6 @@ public class CookieUtil {
     public Cookie buildRefreshCookie(String rawToken) {
         Cookie cookie = new Cookie(REFRESH_COOKIE_NAME, rawToken);
         cookie.setHttpOnly(true);
-        // Local dev runs over plain HTTP; flip this to true once DevMind is served over HTTPS.
         cookie.setSecure(false);
         cookie.setPath("/api/auth");
         cookie.setMaxAge((int) java.time.Duration.ofDays(refreshTokenTtlDays).toSeconds());

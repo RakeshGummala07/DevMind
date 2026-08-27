@@ -23,7 +23,6 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    /** Null for accounts that only ever signed in via GitHub OAuth. */
     @Column(name = "password_hash")
     private String passwordHash;
 
@@ -43,12 +42,6 @@ public class User {
     @Column(nullable = false, length = 32)
     private Role role = Role.USER;
 
-    /**
-     * AES-GCM encrypted GitHub access token (see CryptoUtil), so
-     * repository-service can call the GitHub API on the user's behalf
-     * later (listing/connecting repos) without the raw token ever sitting
-     * in the database in plaintext or ever being sent to the frontend.
-     */
     @Column(name = "github_access_token_encrypted", columnDefinition = "TEXT")
     private String githubAccessTokenEncrypted;
 

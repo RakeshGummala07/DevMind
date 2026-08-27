@@ -3,6 +3,7 @@ package com.devmind.repositoryservice.service;
 import com.devmind.repositoryservice.client.AuthServiceClient;
 import com.devmind.repositoryservice.client.GithubApiClient;
 import com.devmind.repositoryservice.client.GithubApiClient.GithubRepoSummary;
+import com.devmind.repositoryservice.domain.IndexingStatus;
 import com.devmind.repositoryservice.domain.Repository;
 import com.devmind.repositoryservice.dto.AvailableRepoDto;
 import com.devmind.repositoryservice.dto.RepositoryDto;
@@ -36,14 +37,13 @@ public class RepositoryService {
         this.eventPublisher = eventPublisher;
     }
 
-    /** Repos DevMind has already connected for this user. */
     public List<RepositoryDto> listConnected(String userId) {
         return repositoryJpaRepository.findByConnectedByUserId(userId).stream()
                 .map(RepositoryDto::from)
                 .toList();
     }
 
-    /** Repos visible on the user's GitHub account, flagged with whether DevMind already has them. */
+
     public List<AvailableRepoDto> listAvailable(String userId) {
         String token = authServiceClient.getGithubToken(userId).githubAccessToken();
         List<GithubRepoSummary> repos = githubApiClient.listUserRepos(token);
@@ -72,7 +72,7 @@ public class RepositoryService {
                 summary.primaryLanguage(), summary.isPrivate(), summary.starsCount(), summary.forksCount(), userId
         );
         repositoryJpaRepository.save(repo);
-        eventPublisher.publishRepositoryCreated(repo.getId(), repo.getFullName());
+        eventPublisher.publishRepositoryCreated(repo);
 
         return RepositoryDto.from(repo);
     }
@@ -88,7 +88,10 @@ public class RepositoryService {
         Repository repo = repositoryJpaRepository.findById(repositoryId)
                 .orElseThrow(() -> AppException.notFound("REPOSITORY_NOT_FOUND", "Repository was not found"));
 
-        eventPublisher.publishIndexRequested(repo.getId(), repo.getFullName());
+        repo.setIndexingStatus(IndexingStatus.INDEXING);
+        repositoryJpaRepository.save(repo);
+
+        eventPublisher.publishIndexRequested(repo);
         return RepositoryDto.from(repo);
     }
 }

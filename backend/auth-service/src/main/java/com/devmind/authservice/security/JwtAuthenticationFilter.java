@@ -37,8 +37,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         userId, null, List.of(new SimpleGrantedAuthority("ROLE_" + role.name())));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (JwtException | IllegalArgumentException ignored) {
-                // Invalid/expired token: leave the context unauthenticated and let
-                // Spring Security's access rules reject the request as usual.
             }
         }
 

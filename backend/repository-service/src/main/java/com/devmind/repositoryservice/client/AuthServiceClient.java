@@ -45,15 +45,11 @@ public class AuthServiceClient {
                         "Internal service authentication failed (check INTERNAL_API_KEY on both services)");
             }
             if (status.value() == 400) {
-                // This is the expected/legitimate case: auth-service knows the user but they
-                // haven't linked GitHub yet.
                 throw AppException.badRequest("GITHUB_NOT_CONNECTED", "Connect a GitHub account before browsing repositories");
             }
             log.error("Unexpected response from auth-service internal endpoint: {}", status, e);
             throw AppException.badRequest("GITHUB_NOT_CONNECTED", "Connect a GitHub account before browsing repositories");
         } catch (RestClientException e) {
-            // auth-service unreachable entirely (down, DNS, network) — also not a "go click
-            // Connect" situation.
             log.error("Could not reach auth-service at all", e);
             throw AppException.unauthorized("AUTH_SERVICE_UNREACHABLE", "Could not reach the authentication service. Please try again.");
         }

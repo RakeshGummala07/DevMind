@@ -17,7 +17,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AppException.class)
     public ResponseEntity<ErrorResponse> handleAppException(AppException ex) {
-        // Expected, handled errors — log at debug so they don't drown out real problems.
         log.debug("Handled AppException: {} - {}", ex.getCode(), ex.getMessage());
         return ResponseEntity.status(ex.getStatus()).body(ErrorResponse.of(ex.getCode(), ex.getMessage()));
     }
@@ -39,10 +38,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleUnexpected(Exception ex) {
-        // This is the one that matters most: an *unexpected* exception reaching
-        // here means something wasn't translated to a proper AppException. Log
-        // the full stack trace so `docker compose logs auth-service` actually
-        // shows the real cause instead of just a generic 500 downstream.
         log.error("Unhandled exception", ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ErrorResponse.of("INTERNAL_ERROR", "Something went wrong. Please try again."));

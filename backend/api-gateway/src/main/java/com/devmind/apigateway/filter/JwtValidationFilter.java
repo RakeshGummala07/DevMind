@@ -18,17 +18,6 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-/**
- * Validates the JWT access token at the edge, once, so downstream services
- * don't each need their own copy of the validation logic. On success, the
- * raw token is left in place (services may still want it) and the resolved
- * identity is added as X-User-Id / X-User-Role headers, which downstream
- * services can trust because nothing outside the gateway can set them —
- * this filter strips any client-supplied values for those headers first.
- *
- * Public routes (registration, login, GitHub OAuth, refresh, actuator
- * health) skip validation entirely; everything else requires a valid token.
- */
 @Component
 public class JwtValidationFilter implements GlobalFilter, Ordered {
 
@@ -64,8 +53,6 @@ public class JwtValidationFilter implements GlobalFilter, Ordered {
                     .getPayload();
 
             ServerHttpRequest mutatedRequest = request.mutate()
-                    // Strip any client-supplied identity headers before trusting our own —
-                    // otherwise a caller could just set X-User-Role: ADMIN themselves.
                     .headers(headers -> {
                         headers.remove("X-User-Id");
                         headers.remove("X-User-Role");
@@ -91,6 +78,6 @@ public class JwtValidationFilter implements GlobalFilter, Ordered {
 
     @Override
     public int getOrder() {
-        return 0; // after CorrelationIdFilter (-1), before routing
+        return 0;
     }
 }

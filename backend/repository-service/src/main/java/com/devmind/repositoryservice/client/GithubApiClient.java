@@ -12,16 +12,6 @@ import org.springframework.web.client.RestClientException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Talks to the GitHub REST API using a user's access token (fetched
- * server-side from auth-service — see AuthServiceClient). This token is
- * used only for the duration of a single request and never persisted here.
- *
- * Every call is wrapped so a GitHub-side failure (expired/revoked token,
- * repo not found, GitHub outage) becomes a clear AppException instead of
- * an uncaught RestClientException that would otherwise surface as an
- * opaque 500.
- */
 @Component
 public class GithubApiClient {
 
@@ -35,7 +25,6 @@ public class GithubApiClient {
             boolean isPrivate, int starsCount, int forksCount
     ) {}
 
-    /** Repos the authenticated user owns or collaborates on, most recently pushed first. */
     public List<GithubRepoSummary> listUserRepos(String accessToken) {
         JsonNode[] repos;
         try {
@@ -61,12 +50,6 @@ public class GithubApiClient {
     }
 
     public GithubRepoSummary getRepo(String accessToken, String fullName) {
-        // fullName is "owner/repo". Splitting into two template variables — rather than
-        // substituting the whole "owner/repo" string into a single {fullName} placeholder —
-        // matters: Spring URI-template expansion encodes each substituted value as one path
-        // *segment*, so a single {fullName} placeholder would turn the "/" into "%2F" and
-        // GitHub would 404 on the mangled path. Two placeholders keep the "/" as a literal
-        // path separator in the template itself.
         String[] parts = fullName.split("/", 2);
         if (parts.length != 2) {
             throw AppException.badRequest("INVALID_REPO_NAME", "Expected \"owner/repo\", got \"" + fullName + "\"");

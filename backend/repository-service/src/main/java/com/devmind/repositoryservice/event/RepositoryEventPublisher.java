@@ -1,5 +1,6 @@
 package com.devmind.repositoryservice.event;
 
+import com.devmind.repositoryservice.domain.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -22,27 +23,21 @@ public class RepositoryEventPublisher {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void publishRepositoryCreated(String repositoryId, String fullName) {
-        publish(TOPIC_REPOSITORY_CREATED, RepositoryEvent.of("repository.created", repositoryId, fullName));
+    public void publishRepositoryCreated(Repository repo) {
+        publish(TOPIC_REPOSITORY_CREATED, event("repository.created", repo));
     }
 
-    /** Published when a user explicitly requests indexing — ingestion-service consumes this in Phase 4. */
-    public void publishIndexRequested(String repositoryId, String fullName) {
-        publish(TOPIC_INDEX_REQUESTED, RepositoryEvent.of("repository.index.requested", repositoryId, fullName));
+    /** Consumed by ingestion-service in Phase 4 — carries everything needed to clone and index the repo. */
+    public void publishIndexRequested(Repository repo) {
+        publish(TOPIC_INDEX_REQUESTED, event("repository.index.requested", repo));
+    }
+
+    private RepositoryEvent event(String eventType, Repository repo) {
+        return RepositoryEvent.of(
+                eventType, repo.getId(), repo.getFullName(), repo.getDefaultBranch(), repo.getConnectedByUserId());
     }
 
     private void publish(String topic, RepositoryEvent event) {
-        // Publishing is deliberately best-effort: a repository connect/index-request
-        // should succeed even if Kafka is unavailable (e.g. the "lite" Compose
-        // profile doesn't run Kafka at all). kafkaTemplate.send() can fail in two
-        // different ways that both need handling:
-        //   1. Synchronously — e.g. the producer can't even be constructed because
-        //      "bootstrap.servers" doesn't resolve (ConfigException). This throws
-        //      immediately from send() itself, before any Future exists.
-        //   2. Asynchronously — e.g. the broker is unreachable after the producer
-        //      was created fine. This surfaces via the returned Future.
-        // Only case 2 was handled before; case 1 propagated straight out of this
-        // method and failed the whole request that triggered the event.
         try {
             CompletableFuture<SendResult<String, Object>> future =
                     kafkaTemplate.send(topic, event.repositoryId(), event);

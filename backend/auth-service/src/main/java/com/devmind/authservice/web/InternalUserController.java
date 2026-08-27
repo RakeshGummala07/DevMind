@@ -7,18 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * Not routed through api-gateway (see api-gateway's application.yml — no
- * route matches "/internal/**"), so this is only reachable service-to-service
- * inside the Docker network, e.g. by repository-service calling
- * "http://auth-service:8081/internal/...". Still requires a shared secret
- * header as defense in depth, since "not routed externally" isn't the same
- * as "impossible to reach" if the network is ever misconfigured.
- *
- * This is how repository-service gets a user's GitHub access token to call
- * the GitHub API on their behalf, without that token ever passing through
- * the gateway or reaching the frontend.
- */
 @RestController
 @RequestMapping("/internal/users")
 public class InternalUserController {

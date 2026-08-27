@@ -17,13 +17,6 @@ import java.time.Instant;
 import java.util.Base64;
 import java.util.HexFormat;
 
-/**
- * The refresh token is a random opaque value, not a JWT — the client only
- * ever holds the raw value (in an httpOnly cookie); the server only ever
- * stores its SHA-256 hash. This means a leaked database dump can't be used
- * to forge sessions, and logout can actually revoke a specific token instead
- * of just relying on short expiry.
- */
 @Service
 public class RefreshTokenService {
 
@@ -40,7 +33,7 @@ public class RefreshTokenService {
         this.refreshTokenTtl = Duration.ofDays(refreshTokenTtlDays);
     }
 
-    /** Issues a new raw refresh token and persists only its hash. Returns the raw value for the cookie. */
+
     public String issue(User user) {
         byte[] bytes = new byte[32];
         RANDOM.nextBytes(bytes);
@@ -51,7 +44,7 @@ public class RefreshTokenService {
         return rawToken;
     }
 
-    /** Validates a raw refresh token and returns the userId it belongs to. Throws if invalid/expired/revoked. */
+
     public String validateAndGetUserId(String rawToken) {
         RefreshToken token = refreshTokenRepository.findByTokenHash(hash(rawToken))
                 .orElseThrow(() -> AppException.unauthorized("INVALID_REFRESH_TOKEN", "Refresh token is invalid"));
@@ -62,7 +55,7 @@ public class RefreshTokenService {
         return token.getUserId();
     }
 
-    /** Rotation: revoke the presented token and issue a fresh one, so a stolen token can only be replayed once. */
+
     public String rotate(String oldRawToken, User user) {
         refreshTokenRepository.revokeByTokenHash(hash(oldRawToken));
         return issue(user);
