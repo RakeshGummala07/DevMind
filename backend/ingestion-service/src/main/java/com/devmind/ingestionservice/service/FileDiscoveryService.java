@@ -19,6 +19,12 @@ public class FileDiscoveryService {
             ".idea", ".vscode", "__pycache__", ".venv", "venv", ".next", "vendor"
     );
 
+    private static final Set<String> IGNORED_FILE_NAMES = Set.of(
+            "package-lock.json", "npm-shrinkwrap.json", "yarn.lock", "pnpm-lock.yaml",
+            "composer.lock", "Gemfile.lock", "poetry.lock", "Pipfile.lock",
+            "Cargo.lock", "go.sum", "mix.lock"
+    );
+
     // Extension -> language label stored in each chunk's metadata (see ChunkingService).
     private static final Map<String, String> LANGUAGE_BY_EXTENSION = Map.ofEntries(
             Map.entry("java", "Java"), Map.entry("js", "JavaScript"), Map.entry("jsx", "JavaScript"),
@@ -60,6 +66,8 @@ public class FileDiscoveryService {
 
     private DiscoveredFile toDiscoveredFile(Path root, Path path) {
         String fileName = path.getFileName().toString();
+        if (IGNORED_FILE_NAMES.contains(fileName)) return null;
+
         int dot = fileName.lastIndexOf('.');
         if (dot < 0) return null;
 

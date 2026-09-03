@@ -6,6 +6,7 @@ import com.devmind.repositoryservice.client.GithubApiClient.GithubRepoSummary;
 import com.devmind.repositoryservice.domain.IndexingStatus;
 import com.devmind.repositoryservice.domain.Repository;
 import com.devmind.repositoryservice.dto.AvailableRepoDto;
+import com.devmind.repositoryservice.dto.PullRequestDto;
 import com.devmind.repositoryservice.dto.RepositoryDto;
 import com.devmind.repositoryservice.event.RepositoryEventPublisher;
 import com.devmind.repositoryservice.exception.AppException;
@@ -81,6 +82,20 @@ public class RepositoryService {
         return repositoryJpaRepository.findById(repositoryId)
                 .map(RepositoryDto::from)
                 .orElseThrow(() -> AppException.notFound("REPOSITORY_NOT_FOUND", "Repository was not found"));
+    }
+
+    public List<PullRequestDto> listPullRequests(String repositoryId) {
+        Repository repo = repositoryJpaRepository.findById(repositoryId)
+                .orElseThrow(() -> AppException.notFound("REPOSITORY_NOT_FOUND", "Repository was not found"));
+
+        // Uses the repo's own connectedByUserId, not any requesting user — the
+        // person browsing PRs may not be the one who originally connected the
+        // repo, but we always need the token belonging to whoever's GitHub
+        // connection this repo is actually indexed/authorized under.
+        String token = authServiceClient.getGithubToken(repo.getConnectedByUserId()).githubAccessToken();
+        return githubApiClient.listPullRequests(token, repo.getOwner(), repo.getName()).stream()
+                .map(PullRequestDto::from)
+                .toList();
     }
 
     @Transactional

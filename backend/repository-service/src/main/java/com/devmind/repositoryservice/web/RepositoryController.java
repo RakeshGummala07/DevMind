@@ -2,6 +2,7 @@ package com.devmind.repositoryservice.web;
 
 import com.devmind.repositoryservice.dto.AvailableRepoDto;
 import com.devmind.repositoryservice.dto.ConnectRepositoryRequest;
+import com.devmind.repositoryservice.dto.PullRequestDto;
 import com.devmind.repositoryservice.dto.RepositoryDto;
 import com.devmind.repositoryservice.exception.AppException;
 import com.devmind.repositoryservice.service.RepositoryService;
@@ -44,6 +45,11 @@ public class RepositoryController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<RepositoryDto>> getById(@PathVariable String id) {
         return ResponseEntity.ok(ApiResponse.ok(repositoryService.getById(id)));
+    }
+
+    @GetMapping("/{id}/pull-requests")
+    public ResponseEntity<ApiResponse<List<PullRequestDto>>> listPullRequests(@PathVariable String id) {
+        return ResponseEntity.ok(ApiResponse.ok(repositoryService.listPullRequests(id)));
     }
 
     @PostMapping("/{id}/index")

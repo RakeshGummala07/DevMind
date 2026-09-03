@@ -28,6 +28,21 @@ services:
       timeout: 5s
       retries: 10
 
+  mongodb:
+    image: mongo:7
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   qdrant:
     image: qdrant/qdrant:latest
     ports:
@@ -53,9 +68,6 @@ services:
       timeout: 5s
       retries: 10
 
-  # Required from Phase 4 onward — ingestion-service is driven entirely by
-  # repository.index.requested events, so indexing genuinely doesn't work
-  # without a broker, even in the "lite" profile.
   kafka:
     image: apache/kafka:3.8.0
     ports:
@@ -126,6 +138,62 @@ services:
       timeout: 5s
       retries: 10
 
+  ai-service:
+    build:
+      context: ./backend
+      dockerfile: ai-service/Dockerfile
+    env_file: .env
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:8083/actuator/health || exit 1" ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  analysis-service:
+    build:
+      context: ./backend
+      dockerfile: analysis-service/Dockerfile
+    env_file: .env
+    depends_on:
+      mysql:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
+      repository-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8085/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  notification-service:
+    build:
+      context: ./backend
+      dockerfile: notification-service/Dockerfile
+    env_file: .env
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8086/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
   api-gateway:
     build:
       context: ./backend
@@ -141,6 +209,12 @@ services:
       auth-service:
         condition: service_healthy
       repository-service:
+        condition: service_healthy
+      ai-service:
+        condition: service_healthy
+      analysis-service:
+        condition: service_healthy
+      notification-service:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:9000/actuator/health || exit 1"]
@@ -166,5 +240,6 @@ services:
 
 volumes:
   mysql_data:
+  mongo_data:
   qdrant_data:
   ollama_data:

@@ -10,9 +10,10 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @Service
 public class ChunkingService {
+
+    private static final int MAX_CHUNK_CHARS = 6000;
 
     private final int chunkLines;
     private final int overlapLines;
@@ -42,8 +43,10 @@ public class ChunkingService {
             String content = String.join("\n", lines.subList(start, end));
 
             if (!content.isBlank()) {
-                chunks.add(new CodeChunk(content, file.relativePath(), file.language(), index, start + 1, end));
-                index++;
+                for (String piece : splitIfOversized(content)) {
+                    chunks.add(new CodeChunk(piece, file.relativePath(), file.language(), index, start + 1, end));
+                    index++;
+                }
             }
 
             if (end == lines.size()) break;
@@ -51,5 +54,20 @@ public class ChunkingService {
         }
 
         return chunks;
+    }
+
+    private List<String> splitIfOversized(String content) {
+        if (content.length() <= MAX_CHUNK_CHARS) {
+            return List.of(content);
+        }
+
+        List<String> pieces = new ArrayList<>();
+        int offset = 0;
+        while (offset < content.length()) {
+            int end = Math.min(offset + MAX_CHUNK_CHARS, content.length());
+            pieces.add(content.substring(offset, end));
+            offset = end;
+        }
+        return pieces;
     }
 }

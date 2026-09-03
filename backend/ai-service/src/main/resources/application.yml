@@ -19,10 +19,18 @@ management:
 
 devmind:
   qdrant-url: ${QDRANT_URL:http://localhost:6333}
+  qdrant-collection: ${QDRANT_COLLECTION:devmind_code_chunks}
   ai-provider: ${AI_PROVIDER:ollama}
   ollama-base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
   ai-model: ${AI_MODEL:llama3.1:8b}
   embedding-model: ${EMBEDDING_MODEL:nomic-embed-text}
+  min-relevance-score: ${MIN_RELEVANCE_SCORE:0.55}
+  search-top-k: ${SEARCH_TOP_K:8}
+  max-context-chunks: ${AI_MAX_CONTEXT_CHUNKS:4}
+  max-answer-tokens: ${AI_MAX_ANSWER_TOKENS:400}
+  doc-search-top-k: ${DOC_SEARCH_TOP_K:15}
+  doc-max-context-chunks: ${DOC_MAX_CONTEXT_CHUNKS:10}
+  max-doc-tokens: ${AI_MAX_DOC_TOKENS:900}
 
 logging:
   pattern:

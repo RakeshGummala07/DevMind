@@ -13,15 +13,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 
-/**
- * Issues and validates the short-lived JWT access token. This token is what
- * the frontend attaches as `Authorization: Bearer ...` and what the API
- * gateway validates on every request to a protected route (see
- * api-gateway's JwtValidationFilter, which uses the same secret and claim
- * shape so the two never drift apart).
- *
- * The refresh token is deliberately NOT a JWT — see RefreshTokenService.
- */
 @Service
 public class JwtService {
 

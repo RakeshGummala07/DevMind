@@ -12,11 +12,16 @@ spring:
     hibernate:
       ddl-auto: validate
     open-in-view: false
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 0
+    table: analysis_flyway_schema_history
+  threads:
+    virtual:
+      enabled: true
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
-    consumer:
-      group-id: analysis-service
-      auto-offset-reset: earliest
 
 management:
   endpoints:
@@ -29,10 +34,23 @@ management:
 
 devmind:
   qdrant-url: ${QDRANT_URL:http://localhost:6333}
+  qdrant-collection: ${QDRANT_COLLECTION:devmind_code_chunks}
   ai-provider: ${AI_PROVIDER:ollama}
   ollama-base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
   ai-model: ${AI_MODEL:llama3.1:8b}
   embedding-model: ${EMBEDDING_MODEL:nomic-embed-text}
+  min-relevance-score: ${MIN_RELEVANCE_SCORE:0.55}
+  search-top-k: ${SEARCH_TOP_K:8}
+  max-context-chunks: ${AI_MAX_CONTEXT_CHUNKS:4}
+  max-answer-tokens: ${AI_MAX_ANSWER_TOKENS:400}
+  auth-service-url: ${AUTH_SERVICE_URL:http://auth-service:8081}
+  repository-service-url: ${REPOSITORY_SERVICE_URL:http://repository-service:8082}
+  internal-api-key: ${INTERNAL_API_KEY:replace_with_a_shared_internal_secret}
+
+  pr-review:
+    max-files-per-review: ${PR_REVIEW_MAX_FILES:15}
+    max-patch-chars: ${PR_REVIEW_MAX_PATCH_CHARS:4000}
+    excluded-filenames: package-lock.json,yarn.lock,pnpm-lock.yaml
 
 logging:
   pattern:

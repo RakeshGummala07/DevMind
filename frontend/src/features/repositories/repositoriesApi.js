@@ -24,3 +24,8 @@ export async function requestIndexing(id) {
   const { data } = await apiClient.post(`/api/repositories/${id}/index`);
   return data.data;
 }
+
+export async function listPullRequests(id) {
+  const { data } = await apiClient.get(`/api/repositories/${id}/pull-requests`);
+  return data.data; // [{ number, title, state, authorLogin, headSha, baseSha, htmlUrl, updatedAt }]
+}

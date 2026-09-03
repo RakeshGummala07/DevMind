@@ -90,8 +90,6 @@ public class AuthService {
                             User.newGithubUser(profile.id(), profile.login(), email, profile.name(), profile.avatarUrl()));
                 });
 
-        // Refresh the stored token on every login — GitHub tokens issued via the
-        // web flow don't expire, but re-storing keeps this correct if that ever changes.
         user.setGithubAccessTokenEncrypted(encryptedToken);
         userRepository.save(user);
 

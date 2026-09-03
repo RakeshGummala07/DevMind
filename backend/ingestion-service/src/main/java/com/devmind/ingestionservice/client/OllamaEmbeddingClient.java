@@ -32,12 +32,15 @@ public class OllamaEmbeddingClient {
     }
 
     public List<Float> embed(String text) {
+
+        String prefixedText = "search_document: " + text;
+
         JsonNode response;
         try {
             response = restClient.post()
                     .uri("/api/embeddings")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(Map.of("model", embeddingModel, "prompt", text))
+                    .body(Map.of("model", embeddingModel, "prompt", prefixedText))
                     .retrieve()
                     .body(JsonNode.class);
         } catch (RestClientException e) {

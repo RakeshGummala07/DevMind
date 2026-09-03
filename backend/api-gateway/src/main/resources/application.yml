@@ -18,13 +18,10 @@ spring:
           uri: http://auth-service:8081
           predicates:
             - Path=/api/auth/**
-        # More specific ai-service routes must be listed before repository-service's
-        # broader /api/repositories/** catch-all — Spring Cloud Gateway matches routes
-        # in declaration order, and a catch-all listed first would shadow these forever.
         - id: ai-service
           uri: http://ai-service:8083
           predicates:
-            - Path=/api/repositories/*/search,/api/repositories/*/chat,/api/repositories/*/documentation
+            - Path=/api/repositories/*/search,/api/repositories/*/chat,/api/repositories/*/documentation,/api/repositories/*/documentation/**
         - id: repository-service
           uri: http://repository-service:8082
           predicates:
@@ -33,6 +30,10 @@ spring:
           uri: http://analysis-service:8085
           predicates:
             - Path=/api/analytics/**
+        - id: notification-service
+          uri: http://notification-service:8086
+          predicates:
+            - Path=/api/notifications/**
 
   data:
     redis:

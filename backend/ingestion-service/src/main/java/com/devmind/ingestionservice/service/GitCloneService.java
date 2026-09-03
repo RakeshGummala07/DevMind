@@ -41,8 +41,6 @@ public class GitCloneService {
                 .setDirectory(target.toFile())
                 .setBranch(defaultBranch)
                 .setDepth(1)
-                // GitHub accepts the access token as the HTTPS username with any (or empty)
-                // password for token-based auth over HTTPS.
                 .setCredentialsProvider(new UsernamePasswordCredentialsProvider(githubAccessToken, ""))
                 .call()) {
             return target;
@@ -60,12 +58,12 @@ public class GitCloneService {
     private void deleteQuietly(Path dir) {
         if (dir == null || !Files.exists(dir)) return;
         try (var walk = Files.walk(dir)) {
-            walk.sorted((a, b) -> b.compareTo(a)) // children before parents
+            walk.sorted((a, b) -> b.compareTo(a))
                     .forEach(p -> {
                         try {
                             Files.deleteIfExists(p);
                         } catch (IOException ignored) {
-                            // Best-effort cleanup — a leftover temp dir isn't worth failing the pipeline over.
+
                         }
                     });
         } catch (IOException e) {

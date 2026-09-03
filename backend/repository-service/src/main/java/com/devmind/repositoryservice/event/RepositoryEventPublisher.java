@@ -27,7 +27,7 @@ public class RepositoryEventPublisher {
         publish(TOPIC_REPOSITORY_CREATED, event("repository.created", repo));
     }
 
-    /** Consumed by ingestion-service in Phase 4 — carries everything needed to clone and index the repo. */
+
     public void publishIndexRequested(Repository repo) {
         publish(TOPIC_INDEX_REQUESTED, event("repository.index.requested", repo));
     }

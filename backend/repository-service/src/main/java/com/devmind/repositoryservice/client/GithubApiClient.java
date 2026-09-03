@@ -73,6 +73,44 @@ public class GithubApiClient {
         return toSummary(repo);
     }
 
+    public record GithubPullRequestSummary(
+            int number, String title, String state, String authorLogin,
+            String headSha, String baseSha, String htmlUrl, String updatedAt
+    ) {}
+
+    public List<GithubPullRequestSummary> listPullRequests(String accessToken, String owner, String repo) {
+        JsonNode[] prs;
+        try {
+            prs = restClient.get()
+                    .uri("/repos/{owner}/{repo}/pulls?state=open&sort=updated&direction=desc&per_page=50", owner, repo)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    .header(HttpHeaders.ACCEPT, "application/vnd.github+json")
+                    .retrieve()
+                    .body(JsonNode[].class);
+        } catch (RestClientException e) {
+            log.error("Listing pull requests for {}/{} failed", owner, repo, e);
+            throw AppException.unauthorized("GITHUB_API_ERROR",
+                    "Could not list pull requests for " + owner + "/" + repo + ". Your GitHub connection may have expired — try reconnecting.");
+        }
+
+        List<GithubPullRequestSummary> result = new ArrayList<>();
+        if (prs == null) return result;
+
+        for (JsonNode pr : prs) {
+            result.add(new GithubPullRequestSummary(
+                    pr.path("number").asInt(),
+                    pr.path("title").asText(""),
+                    pr.path("state").asText(""),
+                    pr.path("user").path("login").asText(""),
+                    pr.path("head").path("sha").asText(""),
+                    pr.path("base").path("sha").asText(""),
+                    pr.path("html_url").asText(""),
+                    pr.path("updated_at").asText("")
+            ));
+        }
+        return result;
+    }
+
     private GithubRepoSummary toSummary(JsonNode repo) {
         return new GithubRepoSummary(
                 repo.path("id").asLong(),

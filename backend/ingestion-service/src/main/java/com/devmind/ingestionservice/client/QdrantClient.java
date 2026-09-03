@@ -97,7 +97,6 @@ public class QdrantClient {
         }
     }
 
-    /** Deletes every point for a repository — used before re-indexing so stale chunks from a previous run don't linger. */
     public void deleteRepositoryChunks(String repositoryId) {
         ensureCollection();
         try {

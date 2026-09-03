@@ -11,8 +11,6 @@ spring:
       auto-offset-reset: earliest
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
-        # See repository-service's application.yml for why type headers are disabled
-        # and a default type is forced instead — same reasoning applies here.
         spring.json.value.default.type: com.devmind.ingestionservice.event.IndexEvent
         spring.json.use.type.headers: false
         spring.json.trusted.packages: com.devmind.ingestionservice.event

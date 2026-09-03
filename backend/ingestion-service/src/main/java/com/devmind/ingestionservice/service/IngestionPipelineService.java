@@ -56,9 +56,6 @@ public class IngestionPipelineService {
 
             List<DiscoveredFile> files = fileDiscoveryService.discover(checkout);
             log.info("Discovered {} indexable files in {}", files.size(), request.githubFullName());
-
-            // Clear any chunks from a previous indexing run before writing fresh ones,
-            // so re-indexing doesn't leave stale chunks from deleted/renamed files behind.
             qdrantClient.deleteRepositoryChunks(request.repositoryId());
 
             int chunkCount = 0;
@@ -72,8 +69,6 @@ public class IngestionPipelineService {
                         qdrantClient.upsertChunk(request.repositoryId(), request.githubFullName(), request.defaultBranch(), chunk, vector);
                         chunkCount++;
                     } catch (Exception e) {
-                        // One bad chunk (Ollama hiccup, oversized content) shouldn't sink the
-                        // whole repository's indexing run — log it and keep going.
                         embeddingFailures++;
                         log.warn("Skipped chunk {}#{} for {}: {}", file.relativePath(), chunk.chunkIndex(), request.githubFullName(), e.getMessage());
                     }

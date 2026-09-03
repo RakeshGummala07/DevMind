@@ -26,18 +26,11 @@ spring:
       auto-offset-reset: earliest
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
-        # No type headers on the producer side (see KafkaProducerConfig), so force
-        # every consumed event to deserialize as this service's own RepositoryEvent
-        # shape — this works regardless of which service actually published it, as
-        # long as the JSON field names match (see ingestion-service's IndexEvent).
         spring.json.value.default.type: com.devmind.repositoryservice.event.RepositoryEvent
         spring.json.use.type.headers: false
         spring.json.trusted.packages: com.devmind.repositoryservice.event
 
 devmind:
-  # Default is the Docker Compose service name — "localhost" would resolve to
-  # this container itself, not the auth-service container, and every internal
-  # call would fail with a connection error (as happened in Phase 3 testing).
   auth-service-url: ${AUTH_SERVICE_URL:http://auth-service:8081}
   internal-api-key: ${INTERNAL_API_KEY:replace_with_a_shared_internal_secret}
 

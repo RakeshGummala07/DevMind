@@ -23,7 +23,6 @@ public class RefreshToken {
     @Column(name = "user_id", nullable = false)
     private String userId;
 
-    /** SHA-256 hex digest of the raw token. The raw value is never persisted. */
     @Column(name = "token_hash", nullable = false, unique = true, length = 64)
     private String tokenHash;
 

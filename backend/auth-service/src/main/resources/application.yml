@@ -10,7 +10,6 @@ spring:
     password: ${MYSQL_PASSWORD:devmind_local_password}
   jpa:
     hibernate:
-      # Flyway owns the schema; Hibernate only ever validates it matches the entities.
       ddl-auto: validate
     open-in-view: false
   flyway:
