@@ -1,24 +1,32 @@
 package com.devmind.notificationservice.service;
 
 import com.devmind.notificationservice.domain.Notification;
+import com.devmind.notificationservice.domain.NotificationPreference;
 import com.devmind.notificationservice.domain.NotificationType;
 import com.devmind.notificationservice.exception.AppException;
+import com.devmind.notificationservice.repository.NotificationPreferenceRepository;
 import com.devmind.notificationservice.repository.NotificationRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final NotificationPreferenceRepository preferenceRepository;
 
-    public NotificationService(NotificationRepository notificationRepository) {
+    public NotificationService(NotificationRepository notificationRepository, NotificationPreferenceRepository preferenceRepository) {
         this.notificationRepository = notificationRepository;
+        this.preferenceRepository = preferenceRepository;
     }
 
     public Notification createIndexNotification(String userId, boolean succeeded, String repositoryId, String githubFullName) {
         NotificationType type = succeeded ? NotificationType.INDEX_COMPLETED : NotificationType.INDEX_FAILED;
+        if (isMuted(userId, type)) return null;
+
         String title = succeeded ? "Indexing complete" : "Indexing failed";
         String message = succeeded
                 ? githubFullName + " has been indexed and is ready to search and chat with."
@@ -30,6 +38,8 @@ public class NotificationService {
 
     public Notification createReviewNotification(String userId, boolean succeeded, String repositoryId, int prNumber, int findingsCount) {
         NotificationType type = succeeded ? NotificationType.REVIEW_COMPLETED : NotificationType.REVIEW_FAILED;
+        if (isMuted(userId, type)) return null;
+
         String title = succeeded ? "PR review complete" : "PR review failed";
         String message = succeeded
                 ? "Review of PR #" + prNumber + " finished with " + findingsCount + " finding(s)."
@@ -37,6 +47,25 @@ public class NotificationService {
 
         Notification notification = Notification.create(userId, type, title, message, repositoryId);
         return notificationRepository.save(notification);
+    }
+
+    private boolean isMuted(String userId, NotificationType type) {
+        return preferenceRepository.findByUserId(userId)
+                .map(pref -> pref.getMutedTypes().contains(type))
+                .orElse(false);
+    }
+
+    public Set<NotificationType> getMutedTypes(String userId) {
+        return preferenceRepository.findByUserId(userId)
+                .map(NotificationPreference::getMutedTypes)
+                .orElse(EnumSet.noneOf(NotificationType.class));
+    }
+
+    public Set<NotificationType> updateMutedTypes(String userId, Set<NotificationType> mutedTypes) {
+        NotificationPreference pref = preferenceRepository.findByUserId(userId)
+                .orElseGet(() -> NotificationPreference.createDefault(userId));
+        pref.setMutedTypes(mutedTypes);
+        return preferenceRepository.save(pref).getMutedTypes();
     }
 
     public List<Notification> list(String userId, boolean unreadOnly) {

@@ -111,6 +111,78 @@ public class GithubApiClient {
         return result;
     }
 
+    public record GithubCommitSummary(
+            String sha, String authorLogin, String authorName, String message, String committedAt
+    ) {}
+
+    public List<GithubCommitSummary> listCommits(String accessToken, String owner, String repo) {
+        JsonNode[] commits;
+        try {
+            commits = restClient.get()
+                    .uri("/repos/{owner}/{repo}/commits?per_page=100", owner, repo)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    .header(HttpHeaders.ACCEPT, "application/vnd.github+json")
+                    .retrieve()
+                    .body(JsonNode[].class);
+        } catch (RestClientException e) {
+            log.error("Listing commits for {}/{} failed", owner, repo, e);
+            throw AppException.unauthorized("GITHUB_API_ERROR",
+                    "Could not list commits for " + owner + "/" + repo + ". Your GitHub connection may have expired — try reconnecting.");
+        }
+
+        List<GithubCommitSummary> result = new ArrayList<>();
+        if (commits == null) return result;
+
+        for (JsonNode c : commits) {
+            JsonNode commitNode = c.path("commit");
+
+            String login = c.path("author").isNull() ? null : c.path("author").path("login").asText(null);
+            result.add(new GithubCommitSummary(
+                    c.path("sha").asText(""),
+                    login,
+                    commitNode.path("author").path("name").asText(""),
+                    commitNode.path("message").asText(""),
+                    commitNode.path("author").path("date").asText("")
+            ));
+        }
+        return result;
+    }
+
+
+    public record PullRequestLifecycle(int number, String title, String state, String authorLogin, String createdAt, String closedAt, String mergedAt) {}
+
+    public List<PullRequestLifecycle> listPullRequestLifecycles(String accessToken, String owner, String repo) {
+        JsonNode[] prs;
+        try {
+            prs = restClient.get()
+                    .uri("/repos/{owner}/{repo}/pulls?state=all&sort=created&direction=desc&per_page=100", owner, repo)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    .header(HttpHeaders.ACCEPT, "application/vnd.github+json")
+                    .retrieve()
+                    .body(JsonNode[].class);
+        } catch (RestClientException e) {
+            log.error("Listing PR lifecycles for {}/{} failed", owner, repo, e);
+            throw AppException.unauthorized("GITHUB_API_ERROR",
+                    "Could not list pull requests for " + owner + "/" + repo + ". Your GitHub connection may have expired — try reconnecting.");
+        }
+
+        List<PullRequestLifecycle> result = new ArrayList<>();
+        if (prs == null) return result;
+
+        for (JsonNode pr : prs) {
+            result.add(new PullRequestLifecycle(
+                    pr.path("number").asInt(),
+                    pr.path("title").asText(""),
+                    pr.path("state").asText(""),
+                    pr.path("user").path("login").asText(""),
+                    pr.path("created_at").asText(""),
+                    pr.path("closed_at").isNull() ? null : pr.path("closed_at").asText(),
+                    pr.path("merged_at").isNull() ? null : pr.path("merged_at").asText()
+            ));
+        }
+        return result;
+    }
+
     private GithubRepoSummary toSummary(JsonNode repo) {
         return new GithubRepoSummary(
                 repo.path("id").asLong(),

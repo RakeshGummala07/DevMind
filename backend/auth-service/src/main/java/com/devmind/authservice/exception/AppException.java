@@ -29,6 +29,10 @@ public class AppException extends RuntimeException {
         return new AppException(code, message, HttpStatus.BAD_REQUEST);
     }
 
+    public static AppException forbidden(String code, String message) {
+        return new AppException(code, message, HttpStatus.FORBIDDEN);
+    }
+
     public String getCode() {
         return code;
     }

@@ -1,9 +1,11 @@
 package com.devmind.aiservice.web;
 
+import com.devmind.aiservice.dto.AiUsageSummaryDto;
 import com.devmind.aiservice.dto.ChatMessageDto;
 import com.devmind.aiservice.dto.ChatRequest;
 import com.devmind.aiservice.dto.ChatResponseDto;
 import com.devmind.aiservice.dto.SearchResultDto;
+import com.devmind.aiservice.service.AiUsageAnalyticsService;
 import com.devmind.aiservice.service.ChatService;
 import com.devmind.aiservice.service.SearchService;
 import jakarta.validation.Valid;
@@ -18,10 +20,17 @@ public class AiController {
 
     private final ChatService chatService;
     private final SearchService searchService;
+    private final AiUsageAnalyticsService aiUsageAnalyticsService;
 
-    public AiController(ChatService chatService, SearchService searchService) {
+    public AiController(ChatService chatService, SearchService searchService, AiUsageAnalyticsService aiUsageAnalyticsService) {
         this.chatService = chatService;
         this.searchService = searchService;
+        this.aiUsageAnalyticsService = aiUsageAnalyticsService;
+    }
+
+    @GetMapping("/analytics/usage")
+    public ResponseEntity<ApiResponse<AiUsageSummaryDto>> usage(@PathVariable String repositoryId) {
+        return ResponseEntity.ok(ApiResponse.ok(aiUsageAnalyticsService.summary(repositoryId)));
     }
 
     @PostMapping("/chat")

@@ -5,9 +5,9 @@ spring:
   application:
     name: repository-service
   datasource:
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:devmind}
-    username: ${MYSQL_USERNAME:devmind}
-    password: ${MYSQL_PASSWORD:devmind_local_password}
+    url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -17,10 +17,10 @@ spring:
     baseline-on-migrate: true
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
     consumer:
       group-id: repository-service
       auto-offset-reset: earliest
@@ -31,8 +31,8 @@ spring:
         spring.json.trusted.packages: com.devmind.repositoryservice.event
 
 devmind:
-  auth-service-url: ${AUTH_SERVICE_URL:http://auth-service:8081}
-  internal-api-key: ${INTERNAL_API_KEY:replace_with_a_shared_internal_secret}
+  auth-service-url: ${AUTH_SERVICE_URL}
+  internal-api-key: ${INTERNAL_API_KEY}
 
 management:
   endpoints:

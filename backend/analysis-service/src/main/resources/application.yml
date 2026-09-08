@@ -5,9 +5,9 @@ spring:
   application:
     name: analysis-service
   datasource:
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:devmind}
-    username: ${MYSQL_USERNAME:devmind}
-    password: ${MYSQL_PASSWORD:devmind_local_password}
+    url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -21,7 +21,7 @@ spring:
     virtual:
       enabled: true
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
 
 management:
   endpoints:
@@ -33,23 +33,23 @@ management:
       show-details: always
 
 devmind:
-  qdrant-url: ${QDRANT_URL:http://localhost:6333}
-  qdrant-collection: ${QDRANT_COLLECTION:devmind_code_chunks}
-  ai-provider: ${AI_PROVIDER:ollama}
-  ollama-base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
-  ai-model: ${AI_MODEL:llama3.1:8b}
-  embedding-model: ${EMBEDDING_MODEL:nomic-embed-text}
-  min-relevance-score: ${MIN_RELEVANCE_SCORE:0.55}
-  search-top-k: ${SEARCH_TOP_K:8}
-  max-context-chunks: ${AI_MAX_CONTEXT_CHUNKS:4}
-  max-answer-tokens: ${AI_MAX_ANSWER_TOKENS:400}
-  auth-service-url: ${AUTH_SERVICE_URL:http://auth-service:8081}
-  repository-service-url: ${REPOSITORY_SERVICE_URL:http://repository-service:8082}
-  internal-api-key: ${INTERNAL_API_KEY:replace_with_a_shared_internal_secret}
+  qdrant-url: ${QDRANT_URL}
+  qdrant-collection: ${QDRANT_COLLECTION}
+  ai-provider: ${AI_PROVIDER}
+  ollama-base-url: ${OLLAMA_BASE_URL}
+  ai-model: ${AI_MODEL}
+  embedding-model: ${EMBEDDING_MODEL}
+  min-relevance-score: ${MIN_RELEVANCE_SCORE}
+  search-top-k: ${SEARCH_TOP_K}
+  max-context-chunks: ${AI_MAX_CONTEXT_CHUNKS}
+  max-answer-tokens: ${AI_MAX_ANSWER_TOKENS}
+  auth-service-url: ${AUTH_SERVICE_URL}
+  repository-service-url: ${REPOSITORY_SERVICE_URL}
+  internal-api-key: ${INTERNAL_API_KEY}
 
   pr-review:
-    max-files-per-review: ${PR_REVIEW_MAX_FILES:15}
-    max-patch-chars: ${PR_REVIEW_MAX_PATCH_CHARS:4000}
+    max-files-per-review: ${PR_REVIEW_MAX_FILES}
+    max-patch-chars: ${PR_REVIEW_MAX_PATCH_CHARS}
     excluded-filenames: package-lock.json,yarn.lock,pnpm-lock.yaml
 
 logging:

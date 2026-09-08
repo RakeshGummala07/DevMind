@@ -3,10 +3,12 @@ package com.devmind.analysisservice.web;
 import com.devmind.analysisservice.domain.PrReview;
 import com.devmind.analysisservice.domain.PrReviewFinding;
 import com.devmind.analysisservice.dto.PrReviewDto;
+import com.devmind.analysisservice.dto.ReviewAnalyticsSummaryDto;
 import com.devmind.analysisservice.exception.AppException;
 import com.devmind.analysisservice.repository.PrReviewFindingRepository;
 import com.devmind.analysisservice.repository.PrReviewRepository;
 import com.devmind.analysisservice.service.PrReviewService;
+import com.devmind.analysisservice.service.ReviewAnalyticsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,15 +22,23 @@ public class PrReviewController {
     private final PrReviewService prReviewService;
     private final PrReviewRepository prReviewRepository;
     private final PrReviewFindingRepository findingRepository;
+    private final ReviewAnalyticsService reviewAnalyticsService;
 
     public PrReviewController(
             PrReviewService prReviewService,
             PrReviewRepository prReviewRepository,
-            PrReviewFindingRepository findingRepository
+            PrReviewFindingRepository findingRepository,
+            ReviewAnalyticsService reviewAnalyticsService
     ) {
         this.prReviewService = prReviewService;
         this.prReviewRepository = prReviewRepository;
         this.findingRepository = findingRepository;
+        this.reviewAnalyticsService = reviewAnalyticsService;
+    }
+
+    @GetMapping("/repositories/{repositoryId}/summary")
+    public ResponseEntity<ApiResponse<ReviewAnalyticsSummaryDto>> summary(@PathVariable String repositoryId) {
+        return ResponseEntity.ok(ApiResponse.ok(reviewAnalyticsService.summary(repositoryId)));
     }
 
     @PostMapping("/repositories/{repositoryId}/pull-requests/{prNumber}/reviews")

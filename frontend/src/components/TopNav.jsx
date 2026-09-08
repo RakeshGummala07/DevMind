@@ -84,10 +84,26 @@ export default function TopNav({ onMenuClick }) {
                                     overflow: 'hidden',
                                 }}
                             >
-                                <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--border)' }}>
-                                    <div style={{ fontSize: 13 }}>{user?.name}</div>
-                                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{user?.role}</div>
-                                </div>
+                                <button
+                                    onClick={() => { setMenuOpen(false); navigate('/profile'); }}
+                                    style={{
+                                        width: '100%',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'flex-start',
+                                        gap: 2,
+                                        padding: '10px 14px',
+                                        borderBottom: '1px solid var(--border)',
+                                        background: 'transparent',
+                                        border: 'none',
+                                        borderBottomWidth: 1,
+                                        cursor: 'pointer',
+                                        textAlign: 'left',
+                                    }}
+                                >
+                                    <div style={{ fontSize: 13, color: 'var(--text-primary)' }}>{user?.name}</div>
+                                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{user?.role} · View profile</div>
+                                </button>
                                 <button
                                     onClick={handleLogout}
                                     style={{

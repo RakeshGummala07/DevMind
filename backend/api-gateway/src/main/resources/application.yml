@@ -9,39 +9,43 @@ spring:
       globalcors:
         cors-configurations:
           '[/**]':
-            allowedOrigins: ${FRONTEND_ORIGIN:http://localhost:5173}
+            allowedOrigins: ${FRONTEND_ORIGIN}
             allowedMethods: [GET, POST, PUT, PATCH, DELETE, OPTIONS]
             allowedHeaders: "*"
             allowCredentials: true
       routes:
-        - id: auth-service
-          uri: http://auth-service:8081
+        - id: ${AUTH_SERVICE_ID}
+          uri: ${AUTH_SERVICE_URL}
           predicates:
             - Path=/api/auth/**
-        - id: ai-service
-          uri: http://ai-service:8083
+        - id: ${AI_SERVICE_ID}
+          uri: ${AI_SERVICE_URL}
           predicates:
-            - Path=/api/repositories/*/search,/api/repositories/*/chat,/api/repositories/*/documentation,/api/repositories/*/documentation/**
-        - id: repository-service
-          uri: http://repository-service:8082
+            - Path=/api/repositories/*/search,/api/repositories/*/chat,/api/repositories/*/documentation,/api/repositories/*/documentation/**,/api/repositories/*/analytics/usage,/api/config
+        - id: ${REPOSITORY_SERVICE_ID}
+          uri: ${REPOSITORY_SERVICE_URL}
           predicates:
             - Path=/api/repositories/**,/api/pull-requests/**,/api/github/**
-        - id: analysis-service
-          uri: http://analysis-service:8085
+        - id: ${ANALYSIS_SERVICE_ID}
+          uri: ${ANALYSIS_SERVICE_URL}
           predicates:
             - Path=/api/analytics/**
-        - id: notification-service
-          uri: http://notification-service:8086
+        - id: ${NOTIFICATION_SERVICE_ID}
+          uri: ${NOTIFICATION_SERVICE_URL}
           predicates:
             - Path=/api/notifications/**
+        - id: ${INGESTION_SERVICE_ID}
+          uri: ${INGESTION_SERVICE_URL}
+          predicates:
+            - Path=/api/ingestion/**
 
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
 
 devmind:
-  jwt-secret: ${JWT_SECRET:replace_with_a_long_random_string_min_256_bits}
+  jwt-secret: ${JWT_SECRET}
 
 
 management:

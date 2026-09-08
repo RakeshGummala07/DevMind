@@ -8,4 +8,6 @@ import java.util.List;
 public interface PrReviewFindingRepository extends JpaRepository<PrReviewFinding, String> {
 
     List<PrReviewFinding> findByReviewIdOrderByCreatedAtAsc(String reviewId);
+
+    List<PrReviewFinding> findByReviewIdIn(List<String> reviewIds);
 }

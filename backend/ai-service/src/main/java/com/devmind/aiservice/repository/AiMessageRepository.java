@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface AiMessageRepository extends MongoRepository<AiMessage, String> {
     List<AiMessage> findByConversationIdOrderByCreatedAtAsc(String conversationId);
+    List<AiMessage> findByConversationIdIn(List<String> conversationIds);
 }
