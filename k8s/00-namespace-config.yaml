@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: devmind
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: devmind-config
+  namespace: devmind
+data:
+  MYSQL_HOST: ${MYSQL_HOST}
+  MYSQL_PORT: "3306"
+  MYSQL_DATABASE: ${MYSQL_DATABASE}
+  MONGO_HOST: "mongodb"
+  MONGO_PORT: "27017"
+  REDIS_HOST: "redis"
+  REDIS_PORT: "6379"
+  KAFKA_BOOTSTRAP_SERVERS: "kafka:19092"
+  QDRANT_URL: "http://qdrant:6333"
+  QDRANT_COLLECTION: ${QDRANT_COLLECTION}
+  OLLAMA_BASE_URL: "http://ollama:11434"
+  AI_PROVIDER: "ollama"
+  AI_MODEL: ${AI_MODEL}
+  EMBEDDING_MODEL: "EMBEDDING_MODEL"
+  AUTH_SERVICE_URL: ${AUTH_SERVICE_URL}
+  REPOSITORY_SERVICE_URL: ${REPOSITORY_SERVICE_URL}

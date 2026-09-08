@@ -1,0 +1,198 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: { name: mysql-data, namespace: devmind }
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources: { requests: { storage: 5Gi } }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: mysql, namespace: devmind }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: mysql } }
+  template:
+    metadata: { labels: { app: mysql } }
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.4
+          ports: [{ containerPort: 3306 }]
+          env:
+            - { name: MYSQL_DATABASE, valueFrom: { configMapKeyRef: { name: devmind-config, key: MYSQL_DATABASE } } }
+            - { name: MYSQL_USER, valueFrom: { secretKeyRef: { name: devmind-secrets, key: MYSQL_USERNAME } } }
+            - { name: MYSQL_PASSWORD, valueFrom: { secretKeyRef: { name: devmind-secrets, key: MYSQL_PASSWORD } } }
+            - { name: MYSQL_ROOT_PASSWORD, valueFrom: { secretKeyRef: { name: devmind-secrets, key: MYSQL_ROOT_PASSWORD } } }
+          volumeMounts: [{ name: data, mountPath: /var/lib/mysql }]
+          readinessProbe:
+            exec: { command: ["mysqladmin", "ping", "-h", "localhost"] }
+            initialDelaySeconds: 15
+            periodSeconds: 10
+      volumes: [{ name: data, persistentVolumeClaim: { claimName: mysql-data } }]
+---
+apiVersion: v1
+kind: Service
+metadata: { name: mysql, namespace: devmind }
+spec:
+  selector: { app: mysql }
+  ports: [{ port: 3306, targetPort: 3306 }]
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: { name: mongodb-data, namespace: devmind }
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources: { requests: { storage: 5Gi } }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: mongodb, namespace: devmind }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: mongodb } }
+  template:
+    metadata: { labels: { app: mongodb } }
+    spec:
+      containers:
+        - name: mongodb
+          image: mongo:7
+          ports: [{ containerPort: 27017 }]
+          env:
+            - { name: MONGO_INITDB_ROOT_USERNAME, valueFrom: { secretKeyRef: { name: devmind-secrets, key: MONGO_INITDB_ROOT_USERNAME } } }
+            - { name: MONGO_INITDB_ROOT_PASSWORD, valueFrom: { secretKeyRef: { name: devmind-secrets, key: MONGO_INITDB_ROOT_PASSWORD } } }
+          volumeMounts: [{ name: data, mountPath: /data/db }]
+          readinessProbe:
+            exec: { command: ["mongosh", "--eval", "db.adminCommand('ping')"] }
+            initialDelaySeconds: 15
+            periodSeconds: 10
+      volumes: [{ name: data, persistentVolumeClaim: { claimName: mongodb-data } }]
+---
+apiVersion: v1
+kind: Service
+metadata: { name: mongodb, namespace: devmind }
+spec:
+  selector: { app: mongodb }
+  ports: [{ port: 27017, targetPort: 27017 }]
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: redis, namespace: devmind }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: redis } }
+  template:
+    metadata: { labels: { app: redis } }
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          ports: [{ containerPort: 6379 }]
+          readinessProbe:
+            exec: { command: ["redis-cli", "ping"] }
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata: { name: redis, namespace: devmind }
+spec:
+  selector: { app: redis }
+  ports: [{ port: 6379, targetPort: 6379 }]
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: { name: qdrant-data, namespace: devmind }
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources: { requests: { storage: 5Gi } }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: qdrant, namespace: devmind }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: qdrant } }
+  template:
+    metadata: { labels: { app: qdrant } }
+    spec:
+      containers:
+        - name: qdrant
+          image: qdrant/qdrant:latest
+          ports: [{ containerPort: 6333 }, { containerPort: 6334 }]
+          volumeMounts: [{ name: data, mountPath: /qdrant/storage }]
+      volumes: [{ name: data, persistentVolumeClaim: { claimName: qdrant-data } }]
+---
+apiVersion: v1
+kind: Service
+metadata: { name: qdrant, namespace: devmind }
+spec:
+  selector: { app: qdrant }
+  ports: [{ name: http, port: 6333, targetPort: 6333 }, { name: grpc, port: 6334, targetPort: 6334 }]
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: kafka, namespace: devmind }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: kafka } }
+  template:
+    metadata: { labels: { app: kafka } }
+    spec:
+      containers:
+        - name: kafka
+          image: apache/kafka:3.8.0
+          ports: [{ containerPort: 19092 }, { containerPort: 19093 }]
+          env:
+            - { name: KAFKA_NODE_ID, value: "1" }
+            - { name: KAFKA_PROCESS_ROLES, value: "broker,controller" }
+            - { name: KAFKA_LISTENERS, value: "PLAINTEXT://kafka:19092,CONTROLLER://kafka:19093" }
+            - { name: KAFKA_ADVERTISED_LISTENERS, value: "PLAINTEXT://kafka:19092" }
+            - { name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP, value: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT" }
+            - { name: KAFKA_CONTROLLER_QUORUM_VOTERS, value: "1@kafka:19093" }
+            - { name: KAFKA_CONTROLLER_LISTENER_NAMES, value: "CONTROLLER" }
+            - { name: KAFKA_INTER_BROKER_LISTENER_NAME, value: "PLAINTEXT" }
+            - { name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR, value: "1" }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: kafka, namespace: devmind }
+spec:
+  selector: { app: kafka }
+  ports: [{ name: broker, port: 19092, targetPort: 19092 }, { name: controller, port: 19093, targetPort: 19093 }]
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: { name: ollama-data, namespace: devmind }
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources: { requests: { storage: 20Gi } } # room for pulled models
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: ollama, namespace: devmind }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: ollama } }
+  template:
+    metadata: { labels: { app: ollama } }
+    spec:
+      containers:
+        - name: ollama
+          image: ollama/ollama:latest
+          ports: [{ containerPort: 11434 }]
+          volumeMounts: [{ name: data, mountPath: /root/.ollama }]
+      volumes: [{ name: data, persistentVolumeClaim: { claimName: ollama-data } }]
+---
+apiVersion: v1
+kind: Service
+metadata: { name: ollama, namespace: devmind }
+spec:
+  selector: { app: ollama }
+  ports: [{ port: 11434, targetPort: 11434 }]
