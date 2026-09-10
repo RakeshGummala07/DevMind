@@ -196,8 +196,7 @@ export default function PullRequestsPage() {
         queryFn: () => getReviewHistory(repositoryId),
     });
 
-    // Most recent review per PR number, so each row can show its own status
-    // without a separate request per PR.
+
     const latestReviewByPr = useMemo(() => {
         const map = new Map();
         for (const review of historyQuery.data ?? []) {
@@ -224,7 +223,7 @@ export default function PullRequestsPage() {
             <motion.div initial={fadeUp.initial} animate={fadeUp.animate} transition={transitions.base}>
                 <h2 style={{ marginBottom: 4 }}>Pull requests</h2>
                 <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 20 }}>
-                    Request an AI review of any open PR. Findings grounded in this repository's indexed source are
+                    Request an AI review of any open PR. Findings grounded in this repository&apos;s indexed source are
                     marked <span style={{ color: 'var(--signal)' }}>grounded</span>; everything else is based on the
                     diff alone.
                 </p>

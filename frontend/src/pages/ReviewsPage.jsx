@@ -23,9 +23,7 @@ export default function ReviewsPage() {
 
   const repos = reposQuery.data ?? [];
 
-  // One review-history call per connected repo, run in parallel — there's no
-  // cross-repository "all my reviews" endpoint on analysis-service yet, so
-  // this stitches the per-repo endpoint together client-side instead.
+
   const historyQueries = useQueries({
     queries: repos.map((repo) => ({
       queryKey: ['reviews', repo.id, 'history'],
@@ -65,7 +63,7 @@ export default function ReviewsPage() {
 
           {!loadingHistories && repos.length > 0 && allReviews.length === 0 && (
               <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-                No reviews yet. Open a repository's Pull requests tab to request one.
+                No reviews yet. Open a repository&apos;s Pull requests tab to request one.
               </p>
           )}
 

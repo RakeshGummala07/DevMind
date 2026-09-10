@@ -24,7 +24,10 @@ function MetricCard({ label, value, index }) {
 
 export default function AnalyticsPage() {
   const reposQuery = useQuery({ queryKey: ['repositories'], queryFn: listConnectedRepositories });
-  const repos = reposQuery.data ?? [];
+  // Memoized so this doesn't get a new array identity every render when reposQuery.data
+  // is still undefined (loading) — otherwise the useMemo below that depends on `repos`
+  // would recompute every render instead of only when the actual data changes.
+  const repos = useMemo(() => reposQuery.data ?? [], [reposQuery.data]);
 
   // Fan out three lightweight summary calls per repo, mirroring ReviewsPage's cross-repo
   // stitching — there's no cross-repository aggregate endpoint on any service yet, so this
@@ -61,7 +64,7 @@ export default function AnalyticsPage() {
         <h2 style={{ marginBottom: 4 }}>Engineering analytics</h2>
         <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 20 }}>
           Cross-repository PR throughput, AI review activity, and AI usage. Commit/PR numbers reflect each
-          repository's last GitHub sync — open a repository's own analytics tab to sync it.
+          repository&apos;s last GitHub sync — open a repository&apos;s own analytics tab to sync it.
         </p>
 
         {loading && (

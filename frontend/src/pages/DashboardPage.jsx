@@ -14,7 +14,8 @@ const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
 export default function DashboardPage() {
     const reposQuery = useQuery({ queryKey: ['repositories'], queryFn: listConnectedRepositories });
-    const repos = reposQuery.data ?? [];
+    const repos = useMemo(() => reposQuery.data ?? [], [reposQuery.data]);
+
 
     const prQueries = useQueries({
         queries: repos.map((r) => ({ queryKey: ['analytics', r.id, 'prs'], queryFn: () => getPullRequestSummary(r.id), enabled: repos.length > 0 })),
@@ -58,7 +59,7 @@ export default function DashboardPage() {
         ];
     }, [repos, prQueries, reviewSummaryQueries, reviewHistoryQueries]);
 
-    // Merge each repo's last-7-days commit activity into one cross-repo series, keyed by weekday.
+
     const activity = useMemo(() => {
         const byDay = new Map();
         for (let i = 6; i >= 0; i--) {
