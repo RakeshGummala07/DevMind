@@ -32,3 +32,5 @@ logs/
 .env.example
 
 README.md
+
+./k8s/01-secrets.yml

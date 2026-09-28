@@ -9,7 +9,8 @@ spec:
     spec:
       containers:
         - name: auth-service
-          image: devmind/auth-service:latest
+          image: ghcr.io/rakeshgummala07/devmind-auth-service:latest
+          imagePullPolicy: IfNotPresent
           ports: [{ containerPort: 8081 }]
           envFrom: [{ configMapRef: { name: devmind-config } }, { secretRef: { name: devmind-secrets } }]
           readinessProbe: { httpGet: { path: /actuator/health, port: 8081 }, initialDelaySeconds: 20, periodSeconds: 10 }
@@ -31,7 +32,8 @@ spec:
     spec:
       containers:
         - name: repository-service
-          image: devmind/repository-service:latest
+          image: ghcr.io/rakeshgummala07/devmind-repository-service:latest
+          imagePullPolicy: IfNotPresent
           ports: [{ containerPort: 8082 }]
           envFrom: [{ configMapRef: { name: devmind-config } }, { secretRef: { name: devmind-secrets } }]
           readinessProbe: { httpGet: { path: /actuator/health, port: 8082 }, initialDelaySeconds: 20, periodSeconds: 10 }
@@ -53,7 +55,8 @@ spec:
     spec:
       containers:
         - name: ai-service
-          image: devmind/ai-service:latest
+          image: ghcr.io/rakeshgummala07/devmind-ai-service:latest
+          imagePullPolicy: IfNotPresent
           ports: [{ containerPort: 8083 }]
           envFrom: [{ configMapRef: { name: devmind-config } }, { secretRef: { name: devmind-secrets } }]
           readinessProbe: { httpGet: { path: /actuator/health, port: 8083 }, initialDelaySeconds: 20, periodSeconds: 10 }
@@ -75,7 +78,8 @@ spec:
     spec:
       containers:
         - name: ingestion-service
-          image: devmind/ingestion-service:latest
+          image: ghcr.io/rakeshgummala07/devmind-ingestion-service:latest
+          imagePullPolicy: IfNotPresent
           ports: [{ containerPort: 8084 }]
           envFrom: [{ configMapRef: { name: devmind-config } }, { secretRef: { name: devmind-secrets } }]
           readinessProbe: { httpGet: { path: /actuator/health, port: 8084 }, initialDelaySeconds: 20, periodSeconds: 10 }
@@ -97,7 +101,8 @@ spec:
     spec:
       containers:
         - name: analysis-service
-          image: devmind/analysis-service:latest
+          image: ghcr.io/rakeshgummala07/devmind-analysis-service:latest
+          imagePullPolicy: IfNotPresent
           ports: [{ containerPort: 8085 }]
           envFrom: [{ configMapRef: { name: devmind-config } }, { secretRef: { name: devmind-secrets } }]
           readinessProbe: { httpGet: { path: /actuator/health, port: 8085 }, initialDelaySeconds: 20, periodSeconds: 10 }
@@ -119,7 +124,8 @@ spec:
     spec:
       containers:
         - name: notification-service
-          image: devmind/notification-service:latest
+          image: ghcr.io/rakeshgummala07/devmind-notification-service:latest
+          imagePullPolicy: IfNotPresent
           ports: [{ containerPort: 8086 }]
           envFrom: [{ configMapRef: { name: devmind-config } }, { secretRef: { name: devmind-secrets } }]
           readinessProbe: { httpGet: { path: /actuator/health, port: 8086 }, initialDelaySeconds: 20, periodSeconds: 10 }
@@ -141,7 +147,8 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: devmind/api-gateway:latest
+          image: ghcr.io/rakeshgummala07/devmind-api-gateway:latest
+          imagePullPolicy: IfNotPresent
           ports: [{ containerPort: 9000 }]
           envFrom: [{ configMapRef: { name: devmind-config } }, { secretRef: { name: devmind-secrets } }]
           readinessProbe: { httpGet: { path: /actuator/health, port: 9000 }, initialDelaySeconds: 20, periodSeconds: 10 }

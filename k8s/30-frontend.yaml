@@ -9,7 +9,8 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: devmind/frontend:latest
+          image: ghcr.io/rakeshgummala07/devmind-frontend:latest
+          imagePullPolicy: IfNotPresent
           ports: [{ containerPort: 80 }]
           readinessProbe: { httpGet: { path: /, port: 80 }, initialDelaySeconds: 5, periodSeconds: 10 }
 ---
@@ -19,4 +20,4 @@ metadata: { name: frontend, namespace: devmind }
 spec:
   type: LoadBalancer
   selector: { app: frontend }
-  ports: [{ port: 80, targetPort: 80 }]
+  ports: [{ port: 5173, targetPort: 80 }]

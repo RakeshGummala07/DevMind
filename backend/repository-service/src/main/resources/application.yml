@@ -13,8 +13,9 @@ spring:
       ddl-auto: validate
     open-in-view: false
   flyway:
-    enabled: true
+    enabled : true
     baseline-on-migrate: true
+    baseline-version: 0
   data:
     redis:
       host: ${REDIS_HOST}

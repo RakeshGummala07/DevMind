@@ -15,7 +15,8 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
-    table : auth_flyway_schema_history
+    baseline-version: 0
+    table: auth_flyway_schema_history
 
 devmind:
   jwt-secret: ${JWT_SECRET}
