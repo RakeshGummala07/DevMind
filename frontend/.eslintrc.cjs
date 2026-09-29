@@ -16,13 +16,8 @@ module.exports = {
   },
   plugins: ["react", "react-hooks"],
   rules: {
-    // Vite uses the new JSX transform (react/jsx-runtime) — React doesn't need to
-    // be in scope for JSX to work, unlike the older Create React App convention
-    // this rule assumes by default. Every page in this project relies on that.
     "react/react-in-jsx-scope": "off",
     "react/jsx-uses-react": "off",
-    // No PropTypes anywhere in this codebase — turning this off rather than
-    // generating a warning on every single prop in every component.
     "react/prop-types": "off",
   },
   ignorePatterns: ["dist", "node_modules"],

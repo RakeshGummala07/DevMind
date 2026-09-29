@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# The application itself (everything past /login) requires authentication
+# and is not useful to crawl.
+Disallow: /dashboard
+Disallow: /repositories
+Disallow: /reviews
+Disallow: /analytics
+Disallow: /profile
+Disallow: /settings
+Disallow: /oauth/
+
+Sitemap: %VITE_SITE_URL%/sitemap.xml

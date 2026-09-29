@@ -1,70 +1,79 @@
-import { Routes, Route, useLocation } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
+import { lazy, Suspense } from 'react';
+import { Routes, Route } from 'react-router-dom';
 
 import AppLayout from './layouts/AppLayout.jsx';
+import RepositoryLayout from './layouts/RepositoryLayout.jsx';
 import RequireAuth from './layouts/RequireAuth.jsx';
 import { useBootstrapSession } from './features/auth/useBootstrapSession.js';
+import PageFallback from './components/PageFallback.jsx';
+import Logo from './components/Logo.jsx';
 import TraceLine from './components/TraceLine.jsx';
 
-import LandingPage from './pages/LandingPage.jsx';
-import LoginPage from './pages/LoginPage.jsx';
-import RegisterPage from './pages/RegisterPage.jsx';
-import OAuthCallbackPage from './pages/OAuthCallbackPage.jsx';
 
-import DashboardPage from './pages/DashboardPage.jsx';
-import RepositoriesPage from './pages/RepositoriesPage.jsx';
-import RepositoryDetailPage from './pages/RepositoryDetailPage.jsx';
-import CodeSearchPage from './pages/CodeSearchPage.jsx';
-import CodebaseChatPage from './pages/CodebaseChatPage.jsx';
-import PullRequestsPage from './pages/PullRequestsPage.jsx';
-import RepositoryAnalyticsPage from './pages/RepositoryAnalyticsPage.jsx';
-import DocumentationPage from './pages/DocumentationPage.jsx';
-import ReviewsPage from './pages/ReviewsPage.jsx';
-import AnalyticsPage from './pages/AnalyticsPage.jsx';
-import ProfilePage from './pages/ProfilePage.jsx';
-import SettingsPage from './pages/SettingsPage.jsx';
+const LandingPage = lazy(() => import('./pages/LandingPage.jsx'));
+const LoginPage = lazy(() => import('./pages/LoginPage.jsx'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage.jsx'));
+const OAuthCallbackPage = lazy(() => import('./pages/OAuthCallbackPage.jsx'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage.jsx'));
+
+const DashboardPage = lazy(() => import('./pages/DashboardPage.jsx'));
+const RepositoriesPage = lazy(() => import('./pages/RepositoriesPage.jsx'));
+const RepositoryDetailPage = lazy(() => import('./pages/RepositoryDetailPage.jsx'));
+const CodeSearchPage = lazy(() => import('./pages/CodeSearchPage.jsx'));
+const CodebaseChatPage = lazy(() => import('./pages/CodebaseChatPage.jsx'));
+const PullRequestsPage = lazy(() => import('./pages/PullRequestsPage.jsx'));
+const RepositoryAnalyticsPage = lazy(() => import('./pages/RepositoryAnalyticsPage.jsx'));
+const DocumentationPage = lazy(() => import('./pages/DocumentationPage.jsx'));
+const ReviewsPage = lazy(() => import('./pages/ReviewsPage.jsx'));
+const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage.jsx'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage.jsx'));
+const SettingsPage = lazy(() => import('./pages/SettingsPage.jsx'));
 
 export default function App() {
-  const location = useLocation();
   const sessionChecked = useBootstrapSession();
 
   if (!sessionChecked) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ width: 200 }}>
-          <TraceLine active tone="ember" />
+        <div className="center-screen" role="status" aria-label="Checking your session">
+          <Logo size={36} />
+          <div className="trace-slot">
+            <TraceLine active tone="ember" label="Checking your session" />
+          </div>
         </div>
-      </div>
     );
   }
 
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        {/* Public */}
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
+      <Suspense fallback={<PageFallback />}>
+        <Routes>
+          {/* Public */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
 
-        {/* Authenticated */}
-        <Route element={<RequireAuth />}>
-          <Route element={<AppLayout />}>
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/repositories" element={<RepositoriesPage />} />
-            <Route path="/repositories/:id" element={<RepositoryDetailPage />} />
-            <Route path="/repositories/:id/search" element={<CodeSearchPage />} />
-            <Route path="/repositories/:id/chat" element={<CodebaseChatPage />} />
-            <Route path="/repositories/:id/pull-requests" element={<PullRequestsPage />} />
-            <Route path="/repositories/:id/analytics" element={<RepositoryAnalyticsPage />} />
-            <Route path="/repositories/:id/documentation" element={<DocumentationPage />} />
-            <Route path="/reviews" element={<ReviewsPage />} />
-            <Route path="/analytics" element={<AnalyticsPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/settings" element={<SettingsPage />} />
+          {/* Authenticated */}
+          <Route element={<RequireAuth />}>
+            <Route element={<AppLayout />}>
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/repositories" element={<RepositoriesPage />} />
+              <Route path="/repositories/:id" element={<RepositoryLayout />}>
+                <Route index element={<RepositoryDetailPage />} />
+                <Route path="search" element={<CodeSearchPage />} />
+                <Route path="chat" element={<CodebaseChatPage />} />
+                <Route path="pull-requests" element={<PullRequestsPage />} />
+                <Route path="analytics" element={<RepositoryAnalyticsPage />} />
+                <Route path="documentation" element={<DocumentationPage />} />
+              </Route>
+              <Route path="/reviews" element={<ReviewsPage />} />
+              <Route path="/analytics" element={<AnalyticsPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+            </Route>
           </Route>
-        </Route>
-      </Routes>
-    </AnimatePresence>
+
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </Suspense>
   );
 }
