@@ -10,7 +10,7 @@ spec:
       containers:
         - name: frontend
           image: ghcr.io/rakeshgummala07/devmind-frontend:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports: [{ containerPort: 80 }]
           readinessProbe: { httpGet: { path: /, port: 80 }, initialDelaySeconds: 5, periodSeconds: 10 }
 ---
