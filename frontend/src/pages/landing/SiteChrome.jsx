@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import Logo from '../../components/Logo.jsx';
 import Button from '../../components/Button.jsx';
 import { APP_NAME } from '../../config/env.js';
+import { GRIEVANCE_EMAIL } from '../../components/Footer.jsx';
 
 export function SiteHeader() {
   const authenticated = useSelector((s) => s.auth.status === 'authenticated');
@@ -52,9 +53,18 @@ export function SiteFooter() {
             <Link to="/login">Sign in</Link>
             <Link to="/register">Create an account</Link>
           </div>
+          <div>
+            <h2>Legal</h2>
+            <Link to="/privacy">Privacy Notice</Link>
+            <Link to="/terms">Terms of Service</Link>
+            <Link to="/data-rights">Data Rights Request</Link>
+          </div>
         </nav>
       </div>
-      <div className="site-footer__legal">© {new Date().getFullYear()} {APP_NAME}. All rights reserved.</div>
+      <div className="site-footer__legal">
+        © {new Date().getFullYear()} {APP_NAME}. All rights reserved. Grievance Officer:{' '}
+        <a href={`mailto:${GRIEVANCE_EMAIL}`}>{GRIEVANCE_EMAIL}</a>
+      </div>
     </footer>
   );
 }

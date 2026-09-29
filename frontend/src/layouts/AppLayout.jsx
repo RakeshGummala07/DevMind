@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/Sidebar.jsx';
 import TopNav from '../components/TopNav.jsx';
 import PageFallback from '../components/PageFallback.jsx';
+import Footer from '../components/Footer.jsx';
 
 export default function AppLayout() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -20,6 +21,7 @@ export default function AppLayout() {
             <Outlet />
           </Suspense>
         </main>
+          <Footer />
       </div>
     </div>
   );

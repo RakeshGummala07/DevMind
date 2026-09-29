@@ -143,3 +143,6 @@ jobs:
           file: frontend/Dockerfile.prod
           push: ${{ github.ref == 'refs/heads/main' }}
           tags: ghcr.io/${{ steps.owner.outputs.lower }}/devmind-frontend:latest
+          build-args: |
+            VITE_API_BASE_URL=http://localhost:9000
+            VITE_SITE_URL=http://localhost:5173

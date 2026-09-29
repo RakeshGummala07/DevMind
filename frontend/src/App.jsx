@@ -8,6 +8,7 @@ import { useBootstrapSession } from './features/auth/useBootstrapSession.js';
 import PageFallback from './components/PageFallback.jsx';
 import Logo from './components/Logo.jsx';
 import TraceLine from './components/TraceLine.jsx';
+import ConsentBanner from "./components/ConsentBanner.jsx";
 
 
 const LandingPage = lazy(() => import('./pages/LandingPage.jsx'));
@@ -29,6 +30,10 @@ const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage.jsx'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage.jsx'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage.jsx'));
 
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage.jsx'));
+const TermsPage = lazy(() => import('./pages/TermsPage.jsx'));
+const DataRightsRequestPage = lazy(() => import('./pages/DataRightsRequestPage.jsx'));
+
 export default function App() {
   const sessionChecked = useBootstrapSession();
 
@@ -44,12 +49,16 @@ export default function App() {
   }
 
   return (
+      <>
       <Suspense fallback={<PageFallback />}>
         <Routes>
           {/* Public */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/data-rights" element={<DataRightsRequestPage />} />
           <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
 
           {/* Authenticated */}
@@ -75,5 +84,7 @@ export default function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
+        <ConsentBanner />
+      </>
   );
 }
