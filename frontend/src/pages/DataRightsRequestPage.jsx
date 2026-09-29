@@ -29,7 +29,7 @@ export default function DataRightsRequestPage() {
             <PageContainer>
                 <h1>Request received</h1>
                 <p>
-                    We've logged your request and will respond within 10-20 days. A confirmation has been sent to {form.email}.
+                    We&apos;ve logged your request and will respond within 10-20 days. A confirmation has been sent to {form.email}.
                 </p>
             </PageContainer>
         );

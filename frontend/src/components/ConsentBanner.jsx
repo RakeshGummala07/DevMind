@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { recordConsent, getConsent } from '../features/consent/consentApi.js';
+import { recordConsent } from '../features/consent/consentApi.js';
 
 const DISMISSED_KEY = 'devmind_consent_banner_dismissed_v1';
 
@@ -33,7 +33,7 @@ export default function ConsentBanner() {
             }}
         >
             <p style={{ margin: 0, flex: '1 1 280px' }}>
-                DevMind uses only the cookies/storage required to run (session, login). We don't currently use
+                DevMind uses only the cookies/storage required to run (session, login). We don&apos;t currently use
                 analytics or advertising trackers. If that changes, this banner will ask before anything non-essential
                 loads. See our <a href="/privacy">Privacy Notice</a>.
             </p>

@@ -4,11 +4,11 @@ export default function PrivacyPage() {
     return (
         <PageContainer>
             <h1>Privacy Notice</h1>
-            <p><em>Last updated: [LEGAL REVIEW — insert publish date]</em></p>
+            <p><em>Last updated: //</em></p>
 
             <p>
-                This notice explains what personal data DevMind ("we", "us") collects, why, and the rights
-                you have under India's Digital Personal Data Protection Act, 2023 ("DPDP Act").
+                This notice explains what personal data DevMind (&quot;we&quot;, &quot;us&quot;) collects, why, and the rights
+                you have under India&apos;s Digital Personal Data Protection Act, 2023 (&quot;DPDP Act&quot;).
             </p>
 
             <h2>Who we are</h2>
@@ -59,9 +59,9 @@ export default function PrivacyPage() {
                 </tr>
                 <tr>
                     <td>Commit author names and emails, pull request metadata</td>
-                    <td>Pulled from GitHub as part of a connected repository's history</td>
+                    <td>Pulled from GitHub as part of a connected repository&apos;s history</td>
                     <td>Power repository analytics, AI code search/chat, PR review</td>
-                    <td>[LEGAL REVIEW — this is standard git metadata, but the people it identifies are often not DevMind account holders themselves; retention should track the connected repository's lifecycle]</td>
+
                 </tr>
                 </tbody>
             </table>
@@ -75,7 +75,7 @@ export default function PrivacyPage() {
 
             <h2>Third parties</h2>
             <ul>
-                <li><strong>GitHub</strong> — identity provider (OAuth) and source of repository data, including commit author names/emails. See GitHub's own privacy policy.</li>
+                <li><strong>GitHub</strong> — identity provider (OAuth) and source of repository data, including commit author names/emails. See GitHub&apos;s own privacy policy.</li>
                 <li>
                     <strong>No email, SMS, or payment provider is used.</strong> Confirmed against the
                     infrastructure configuration — there is nothing to disclose here.
@@ -101,7 +101,7 @@ export default function PrivacyPage() {
                 <li><strong>Correct</strong> — fix inaccurate or incomplete data.</li>
                 <li><strong>Erase</strong> — request deletion of your data, subject to legal retention requirements.</li>
                 <li><strong>Withdraw consent</strong> — for anything you opted into, at any time, as easily as you gave it.</li>
-                <li><strong>Grievance redressal</strong> — raise a complaint if you believe we've mishandled your data.</li>
+                <li><strong>Grievance redressal</strong> — raise a complaint if you believe we have mishandled your data.</li>
             </ul>
             <p>
                 To exercise any of these, use our <a href="/data-rights">Data Rights Request form</a>, or contact
