@@ -68,6 +68,8 @@ jobs:
       - name: Build
         working-directory: frontend
         run: npm run build
+        env:
+          VITE_SITE_URL: http://localhost:5173
 
 
   docker:
